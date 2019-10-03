@@ -90,3 +90,6 @@ ENV/
 
 # for MAC OS DS_Store
 .DS_Store
+
+# .vagrant should not be seen 
+.vagrant
