@@ -26,7 +26,7 @@ Attributes:
 id (int) - the identity of the Recommendation
 product_id (int) - the identity of the product that the recommendation is for
 customer_id (int) - the identity of the customer that the recommendation is for
-type (string) - the type of the recommendation (upscale, downscale, etc)
+recommend_type (string) - the recommend_type of the recommendation (upscale, downscale, etc)
 recommend_product_id (int) - the identity of recommended product
 """
 import logging
@@ -35,9 +35,11 @@ from flask_sqlalchemy import SQLAlchemy
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
 
+
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
     pass
+
 
 class Recommendation(db.Model):
     """
@@ -48,29 +50,24 @@ class Recommendation(db.Model):
     """
     logger = logging.getLogger('flask.app')
     app = None
-
-    def __init__(self):
-        self.id = db.Column(db.Integer, primary_key=True)
-        self.product_id = db.Column(db.Integer)
-        self.customer_id = db.Column(db.Integer)
-        self.type = db.Column(db.String(63))
-        self.recommend_product_id = db.Column(db.Integer)
-
-    def __repr__(self):
-        return '<Recommendation %r>' % self.id
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer)
+    customer_id = db.Column(db.Integer)
+    recommend_type = db.Column(db.String(63))
+    recommend_product_id = db.Column(db.Integer)
 
     def save(self):
         """
         Saves a Recommendation to the data store
         """
-        Recommendation.logger.info('Saving %s', self.name)
+        Recommendation.logger.info('Saving %s', self.id)
         if not self.id:
             db.session.add(self)
         db.session.commit()
 
     def delete(self):
         """ Removes a Recommendation from the data store """
-        Recommendation.logger.info('Deleting %s', self.name)
+        Recommendation.logger.info('Deleting %s', self.id)
         db.session.delete(self)
         db.session.commit()
 
@@ -79,8 +76,8 @@ class Recommendation(db.Model):
         return {"id": self.id,
                 "product id": self.product_id,
                 "customer id": self.customer_id,
-                "type": self.type,
-                "recommend id": self.recommend_product_id}
+                "recommend type": self.recommend_type,
+                "recommend product id": self.recommend_product_id}
 
     def deserialize(self, data):
         """
@@ -93,12 +90,12 @@ class Recommendation(db.Model):
             self.id = data['id']
             self.customer_id = data['customer_id']
             self.product_id = data['product_id']
-            self.type = data['type']
+            self.recommend_type = data['recommend_type']
             self.recommend_product_id = data['recommend_product_id']
         except KeyError as error:
             raise DataValidationError('Invalid Recommendation: missing ' + error.args[0])
         except TypeError as error:
-            raise DataValidationError('Invalid Recommendation: body of request contained' \
+            raise DataValidationError('Invalid Recommendation: body of request contained'
                                       'bad or no data')
         return self
 
@@ -117,57 +114,3 @@ class Recommendation(db.Model):
         """ Returns all of the Recommendations in the database """
         cls.logger.info('Processing all Recommendations')
         return cls.query.all()
-
-    @classmethod
-    def find(cls, rec_id):
-        """ Finds a Recommendation by it's ID """
-        cls.logger.info('Processing lookup for id %s ...', rec_id)
-        return cls.query.get(rec_id)
-
-    @classmethod
-    def find_or_404(cls,rec_id):
-        """ Find a Recommendation by it's id """
-        cls.logger.info('Processing lookup or 404 for id %s ...', rec_id)
-        return cls.query.get_or_404(rec_id)
-
-    @classmethod
-    def find_by_product_id(cls, product_id):
-        """ Returns all Recommendations with the given product id
-
-        Args:
-            product_id (string): the product id of the Recommendations you want to match
-        """
-        cls.logger.info('Processing product id query for %s ...', product_id)
-        return cls.query.filter(cls.product_id == product_id)
-
-    @classmethod
-    def find_by_customer_id(cls, customer_id):
-        """ Returns all of the Recommendations for a customer
-
-        Args:
-            customer_id (string): the customer id of the Recommendations you want to match
-        """
-        cls.logger.info('Processing customer id query for %s ...', customer_id)
-        return cls.query.filter(cls.customer_id == customer_id)
-
-    @classmethod
-    def find_by_type(cls, type):
-        """ Query that finds Recommendations by their type """
-        """ Returns all Recommendations by their type
-
-        Args:
-            type (string): True for Recommendations that are available
-        """
-        cls.logger.info('Processing available query for %s ...', type)
-        return cls.query.filter(cls.type == type)
-
-    @classmethod
-    def find_by_recommend_product_id(cls, recommend_product_id):
-        """ Query that finds Recommendations by their recommend id """
-        """ Returns all Recommendations by their recommend id
-
-        Args:
-            recommend_product_id (string): True for Recommendations that are available
-        """
-        cls.logger.info('Processing available query for %s ...', recommend_product_id)
-        return cls.query.filter(cls.recommend_product_id == recommend_product_id)
