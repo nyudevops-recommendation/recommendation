@@ -114,3 +114,12 @@ class Recommendation(db.Model):
         """ Returns all of the Recommendations in the database """
         cls.logger.info('Processing all Recommendations')
         return cls.query.all()
+
+    @classmethod
+    def find_by_id(cls, id):
+        """ Returns all of the Recommendation in an id
+        Args:
+            id (string): the id of the Recommendation you want to match
+        """
+        cls.logger.info('Processing id query for %s ...', id)
+        return cls.query.filter(cls.id == id)
