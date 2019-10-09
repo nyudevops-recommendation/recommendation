@@ -115,11 +115,29 @@ class Recommendation(db.Model):
         cls.logger.info('Processing all Recommendations')
         return cls.query.all()
 
+    #@classmethod
+    #def find_by_id(cls, id):
+    #    """ Returns all of the Recommendation in an id
+    #    Args:
+    #        id (string): the id of the Recommendation you want to match
+    #    """
+    #    cls.logger.info('Processing id query for %s ...', id)
+    #    return cls.query.filter(cls.id == id)
+        
     @classmethod
-    def find_by_id(cls, id):
-        """ Returns all of the Recommendation in an id
+    def find_by_product_id(cls, id):
+        """ Returns all of the Recommendation in an product_id
         Args:
-            id (string): the id of the Recommendation you want to match
+            product_id (string): the product_id of the Recommendation you want to match
         """
-        cls.logger.info('Processing id query for %s ...', id)
-        return cls.query.filter(cls.id == id)
+        cls.logger.info('Processing product_id query for %s ...', product_id)
+        return cls.query.filter(cls.product_id == product_id)
+        
+    @classmethod
+    def find_by_recommend_type(cls, recommend_type):
+        """ Returns all of the Recommendation in an recommend_type
+        Args:
+            recommend_type (string): the recommend_type of the Recommendation you want to match
+        """
+        cls.logger.info('Processing recommend_type query for %s ...', recommend_type)
+        return cls.query.filter(cls.recommend_type == recommend_type)
