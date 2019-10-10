@@ -111,18 +111,19 @@ class TestRecommendations(unittest.TestCase):
         recommendation = Recommendation(customer_id=2,
                                         product_id=3, recommend_product_id=4,
                                         recommend_type="upscale")
+
         data = recommendation.serialize()
         self.assertNotEqual(data, None)
         self.assertIn('id', data)
         self.assertEqual(data['id'], None)
-        self.assertIn('customer id', data)
-        self.assertEqual(data['customer id'], 2)
-        self.assertIn('product id', data)
-        self.assertEqual(data['product id'], 3)
-        self.assertIn('recommend product id', data)
-        self.assertEqual(data['recommend product id'], 4)
-        self.assertIn('recommend type', data)
-        self.assertEqual(data['recommend type'], "upscale")
+        self.assertIn('customer_id', data)
+        self.assertEqual(data['customer_id'], 2)
+        self.assertIn('product_id', data)
+        self.assertEqual(data['product_id'], 3)
+        self.assertIn('recommend_product_id', data)
+        self.assertEqual(data['recommend_product_id'], 4)
+        self.assertIn('recommend_type', data)
+        self.assertEqual(data['recommend_type'], "upscale")
 
     def test_deserialize_a_recommendation(self):
         """ Test deserialization of a Recommendation """
@@ -153,44 +154,43 @@ class TestRecommendations(unittest.TestCase):
         data = "this is not a dictionary"
         recommendation = Recommendation()
         self.assertRaises(DataValidationError, recommendation.deserialize, data)
-        
-        
+
     def test_find_by_product_id(self):
         """ Find Recommendation by product_id """
         Recommendation(customer_id=2,
-        product_id=3, recommend_product_id=4,
-        recommend_type="upscale").save()
+                       product_id=3, recommend_product_id=4,
+                       recommend_type="upscale").save()
         Recommendation(customer_id=5,
-        product_id=6, recommend_product_id=7,
-        recommend_type="downscale").save()
+                       product_id=6, recommend_product_id=7,
+                       recommend_type="downscale").save()
         recommendations = Recommendation.find_by_product_id(6)
         self.assertEqual(recommendations[0].customer_id, 5)
         self.assertEqual(recommendations[0].product_id, 6)
         self.assertEqual(recommendations[0].recommend_product_id, 7)
         self.assertEqual(recommendations[0].recommend_type, "downscale")
-           
+
     def test_find_by_customer_id(self):
         """ Find Recommendation by customer_id """
         Recommendation(customer_id=2,
-        product_id=3, recommend_product_id=4,
-        recommend_type="upscale").save()
+                       product_id=3, recommend_product_id=4,
+                       recommend_type="upscale").save()
         Recommendation(customer_id=5,
-        product_id=6, recommend_product_id=7,
-        recommend_type="downscale").save()
+                       product_id=6, recommend_product_id=7,
+                       recommend_type="downscale").save()
         recommendations = Recommendation.find_by_customer_id(5)
         self.assertEqual(recommendations[0].customer_id, 5)
         self.assertEqual(recommendations[0].product_id, 6)
         self.assertEqual(recommendations[0].recommend_product_id, 7)
         self.assertEqual(recommendations[0].recommend_type, "downscale")
-    
+
     def test_find_by_recommend_type(self):
         """ Find Recommendation by recommend_type """
         Recommendation(customer_id=2,
-        product_id=3, recommend_product_id=4,
-        recommend_type="upscale").save()
+                       product_id=3, recommend_product_id=4,
+                       recommend_type="upscale").save()
         Recommendation(customer_id=5,
-        product_id=6, recommend_product_id=7,
-        recommend_type="downscale").save()
+                       product_id=6, recommend_product_id=7,
+                       recommend_type="downscale").save()
         recommendations = Recommendation.find_by_recommend_type("downscale")
         self.assertEqual(recommendations[0].customer_id, 5)
         self.assertEqual(recommendations[0].product_id, 6)

@@ -1,3 +1,4 @@
+# Copyright 2016, 2019 John J. Rofrano. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,3 +33,17 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = SECRET_KEY
+
+# Import the routes After the Flask app is created
+from service import service, models
+
+# Set up logging for production
+service.initialize_logging()
+
+app.logger.info(70 * '*')
+app.logger.info('  R E C O M M E N D A T I O N   S E R V I C E   R U N N I N G  '.center(70, '*'))
+app.logger.info(70 * '*')
+
+service.init_db()  # make our sqlalchemy tables
+
+app.logger.info('Service inititalized!')
