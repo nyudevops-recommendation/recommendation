@@ -120,3 +120,30 @@ class Recommendation(db.Model):
         """ Finds a Recommendation by it's ID """
         cls.logger.info('Processing lookup for id %s ...', rec_id)
         return cls.query.get(rec_id)
+
+    @classmethod
+    def find_by_product_id(cls, product_id):
+        """ Returns all of the Recommendation in an product_id
+        Args:
+            product_id (string): the product_id of the Recommendation you want to match
+        """
+        cls.logger.info('Processing product_id query for %s ...', product_id)
+        return cls.query.filter(cls.product_id == product_id)
+
+    @classmethod
+    def find_by_customer_id(cls, customer_id):
+        """ Returns all of the Recommendation in an customer_id
+        Args:
+            customer_id (string): the customer_id of the Recommendation you want to match
+        """
+        cls.logger.info('Processing customer_id query for %s ...', customer_id)
+        return cls.query.filter(cls.customer_id == customer_id)
+
+    @classmethod
+    def find_by_recommend_type(cls, recommend_type):
+        """ Returns all of the Recommendation in an recommend_type
+        Args:
+            recommend_type (string): the recommend_type of the Recommendation you want to match
+        """
+        cls.logger.info('Processing recommend_type query for %s ...', recommend_type)
+        return cls.query.filter(cls.recommend_type == recommend_type)
