@@ -19,7 +19,7 @@ Paths:
 ------
 list: HTTP GET /recommendations - return a list all of the recommendations
 read: HTTP GET /recommendations/{rec_id} - return the recommendation with id number
-query: HTTP GET /recommendations?product-id=123&type=upscale&customer-id=111 return the recommendation with specific product-id, customer-id
+query: HTTP GET /recommendations?product_id=123&recommend_type=upscale&customer_id=111 return the recommendation with specific product-id, customer-id
 create: HTTP POST /recommendations - creates a new recommendation record in the database
 update: HTTP PUT /recommendations/{rec_id} - updates a recommendation record in the database
 delete: HTTP DELETE /recommendations/{rec_id} - deletes a recommendation record in the database
@@ -107,7 +107,7 @@ def index():
                   ), status.HTTP_200_OK
 
 ######################################################################
-# LIST ALL Recommendations
+# LIST ALL RECOMMENDATIONS
 # HTTP GET /recommendations - return a list all of the recommendations
 ######################################################################
 @app.route('/recommendations', methods=['GET'])
@@ -131,7 +131,7 @@ def list_recommendations():
     return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################
-# RETRIEVE A Recommendation
+# RETRIEVE A RECOMMENDATION
 # HTTP GET /recommendations/{rec_id} - return the recommendation with id number
 ######################################################################
 @app.route('/recommendations/<int:rec_id>', methods=['GET'])
@@ -148,7 +148,7 @@ def get_recommendations(rec_id):
     return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)
 
 ######################################################################
-# ADD A NEW Recommendation
+# ADD A NEW RECOMMENDATION
 # HTTP POST /recommendations - creates a new recommendation record in the database
 ######################################################################
 @app.route('/recommendations', methods=['POST'])
@@ -170,7 +170,7 @@ def create_recommendations():
                          })
 
 ######################################################################
-# DELETE A recommendation
+# DELETE A RECOMMENDATION
 # HTTP DELETE /recommendations/{rec_id} - deletes a recommendation record in the database
 ######################################################################
 
@@ -186,6 +186,26 @@ def delete_recommendations(rec_id):
     if recommendation:
         recommendation.delete()
     return make_response('', status.HTTP_204_NO_CONTENT)
+
+######################################################################
+# UPDATE AN EXISTING RECOMMENDATION
+# HTTP PUT /recommendations/{rec_id} - updates a recommendation record in the database
+######################################################################
+@app.route('/recommendations/<int:rec_id>', methods=['PUT'])
+def update_recommendations(rec_id):
+    """
+    Update a Recommendations
+    This endpoint will update a Recommendation based the body that is posted
+    """
+    app.logger.info('Request to update recommendation with id: %s', rec_id)
+    check_content_type('application/json')
+    recommendation = Recommendation.find(rec_id)
+    if not recommendation:
+        raise NotFound("Recommendation with id '{}' was not found.".format(rec_id))
+    recommendation.deserialize(request.get_json())
+    recommendation.id = rec_id
+    recommendation.save()
+    return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
