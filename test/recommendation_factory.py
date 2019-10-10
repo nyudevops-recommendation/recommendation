@@ -19,15 +19,19 @@ import factory
 from factory.fuzzy import FuzzyChoice
 from service.models import Recommendation
 
+
 class RecommendationFactory(factory.Factory):
     """ Creates fake recommendations that you don't have to feed """
+
     class Meta:
         model = Recommendation
+
     id = factory.Sequence(lambda n: n)
-    product_id = factory.Sequence(lambda n: n+1)
-    customer_id = factory.Sequence(lambda n: n+2)
+    product_id = factory.Sequence(lambda n: n + 1)
+    customer_id = factory.Sequence(lambda n: n + 2)
     recommend_type = FuzzyChoice(choices=["upsale", "cross-sell", "accessory"])
-    recommend_product_id = factory.Sequence(lambda n: n+3)
+    recommend_product_id = factory.Sequence(lambda n: n + 3)
+
 
 if __name__ == '__main__':
     for _ in range(10):

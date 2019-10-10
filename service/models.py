@@ -74,10 +74,10 @@ class Recommendation(db.Model):
     def serialize(self):
         """ Serializes a Recommendation into a dictionary """
         return {"id": self.id,
-                "product id": self.product_id,
-                "customer id": self.customer_id,
-                "recommend type": self.recommend_type,
-                "recommend product id": self.recommend_product_id}
+                "product_id": self.product_id,
+                "customer_id": self.customer_id,
+                "recommend_type": self.recommend_type,
+                "recommend_product_id": self.recommend_product_id}
 
     def deserialize(self, data):
         """
@@ -95,7 +95,7 @@ class Recommendation(db.Model):
         except KeyError as error:
             raise DataValidationError('Invalid Recommendation: missing ' + error.args[0])
         except TypeError as error:
-            raise DataValidationError('Invalid Recommendation: body of request contained'
+            raise DataValidationError('Invalid Recommendation: body of request contained' \
                                       'bad or no data')
         return self
 
@@ -114,3 +114,9 @@ class Recommendation(db.Model):
         """ Returns all of the Recommendations in the database """
         cls.logger.info('Processing all Recommendations')
         return cls.query.all()
+
+    @classmethod
+    def find(cls, rec_id):
+        """ Finds a Recommendation by it's ID """
+        cls.logger.info('Processing lookup for id %s ...', rec_id)
+        return cls.query.get(rec_id)
