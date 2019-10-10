@@ -48,5 +48,4 @@ git merge master
 git push -u origin my-branch
 ```
 (go to the PR page and attach your nosetests results in the description, and if there's no test results, the PR shouldn't be approved)
-```
 
