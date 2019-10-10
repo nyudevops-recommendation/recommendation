@@ -25,3 +25,28 @@ nosetests
 FLASK_APP=service:app flask run --host=0.0.0.0 --port=5000
 ```
 then on your own machine, visit: http://localhost:5000/
+
+## To send out pull requests
+
+```
+git checkout -b my-branch
+```
+(add/modify something)
+```
+git add something
+git commit -m "add/modify something"
+```
+(Tips: save your local changes to a safe place and pray for no merge conflicts would occur before you do the following...)  
+```
+git checkout master
+git pull
+git checkout my-branch
+git merge master
+```
+(fix merge conflicts and git add, git commit again)
+```
+git push -u origin my-branch
+```
+(go to the PR page and attach your nosetests results in the description, and if there's no test results, the PR shouldn't be approved)
+```
+
