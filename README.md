@@ -1,4 +1,4 @@
-# recommendations
+# Recommendations
 
 **Description:**
 
@@ -13,3 +13,15 @@ The recommendations resource is a representation a product recommendation based 
 - **update:** HTTP PUT /recommendations/{rec-id}
 - **delete:** HTTP DELETE /recommendations/{rec-id}
 - **success:** HTTP PUT /recommendations/{rec-id}/success
+
+
+**To run the Flask app:**   
+
+```
+vagrant up
+vagrant ssh
+cd /vagrant
+nosetests
+FLASK_APP=service:app flask run --host=0.0.0.0 --port=5000
+```
+then on your own machine, visit: http://localhost:5000/
