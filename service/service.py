@@ -18,12 +18,12 @@ Recommendation Service
 Paths:
 ------
 list: HTTP GET /recommendations - return a list all of the recommendations
-read: HTTP GET /recommendations/{rec-id} - return the recommendation with id number
+read: HTTP GET /recommendations/{rec_id} - return the recommendation with id number
 query: HTTP GET /recommendations?product-id=123&type=upscale&customer-id=111 return the recommendation with specific product-id, customer-id
 create: HTTP POST /recommendations - creates a new recommendation record in the database
-update: HTTP PUT /recommendations/{rec-id} - updates a recommendation record in the database
-delete: HTTP DELETE /recommendations/{rec-id} - deletes a recommendation record in the database
-success: HTTP PUT /recommendations/{rec-id}/success
+update: HTTP PUT /recommendations/{rec_id} - updates a recommendation record in the database
+delete: HTTP DELETE /recommendations/{rec_id} - deletes a recommendation record in the database
+success: HTTP PUT /recommendations/{rec_id}/success
 """
 
 import os
@@ -174,7 +174,7 @@ def create_recommendations():
 # HTTP DELETE /recommendations/{rec_id} - deletes a recommendation record in the database
 ######################################################################
 
-@app.route('/pets/<int:rec_id>', methods=['DELETE'])
+@app.route('/recommendations/<int:rec_id>', methods=['DELETE'])
 def delete_recommendations(rec_id):
     """
     Delete a recommendation
