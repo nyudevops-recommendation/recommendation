@@ -132,7 +132,7 @@ class TestRecommendations(unittest.TestCase):
         recommendation = Recommendation()
         recommendation.deserialize(data)
         self.assertNotEqual(recommendation, None)
-        self.assertEqual(recommendation.id, 1)
+        self.assertEqual(recommendation.id, None)
         self.assertEqual(recommendation.customer_id, 2)
         self.assertEqual(recommendation.product_id, 3)
         self.assertEqual(recommendation.recommend_product_id, 4)
