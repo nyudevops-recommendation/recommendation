@@ -29,6 +29,19 @@ from service.models import Recommendation, DataValidationError
 from . import app
 
 
+######################################################################
+# LIST ALL RECOMMENDATIONS
+######################################################################
+@app.route('/recommendations', methods=['GET'])
+def list_recommendations():
+    """ Returns all Recommendations """
+    app.logger.info('Request for recommendation list')
+    recommendations = []
+    recommendations = Recommendation.all()
+
+    results = [recommendation.serialize() for recommendation in recommendations]
+    return make_response(jsonify(results), status.HTTP_200_OK)
+	
 # #####################################################################
 # RETRIEVE A RECOMMENDATION
 # #####################################################################
