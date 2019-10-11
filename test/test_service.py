@@ -76,6 +76,16 @@ class TestRecommendationServer(unittest.TestCase):
             test_recommendation.id = new_recommendation['id']
             recommendations.append(test_recommendation)
         return recommendations
+		
+    def test_get_recommendation(self):
+        """ Get a single Recommendation """
+        # get the id of a recommendation
+        test_rec = self._create_recommendations(1)[0]
+        resp = self.app.get('/recommendations/{}'.format(test_rec.id),
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data['id'], test_rec.id)
 
     def test_create_recommendation(self):
         """ Create a new Recommendation """
@@ -115,7 +125,7 @@ class TestRecommendationServer(unittest.TestCase):
                              json=test_recommendation.serialize(),
                              content_type="a_bad_type")
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-
+		
     def test_get_recommendation_not_found(self):
         """ Get a Recommendation thats not found """
         resp = self.app.get('/recommendations/0')
