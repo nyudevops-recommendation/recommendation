@@ -21,6 +21,7 @@ Test cases can be run with:
 
 import unittest
 import os
+from werkzeug.exceptions import NotFound
 from service.models import Recommendation, DataValidationError, db
 from service import app
 
@@ -46,7 +47,7 @@ class TestRecommendations(unittest.TestCase):
 
     def setUp(self):
         Recommendation.init_db(app)
-        db.drop_all()  # clean up the last tests
+        db.drop_all()    # clean up the last tests
         db.create_all()  # make our sqlalchemy tables
 
     def tearDown(self):
@@ -131,7 +132,7 @@ class TestRecommendations(unittest.TestCase):
         recommendation = Recommendation()
         recommendation.deserialize(data)
         self.assertNotEqual(recommendation, None)
-        self.assertEqual(recommendation.id, 1)
+        self.assertEqual(recommendation.id, None)
         self.assertEqual(recommendation.customer_id, 2)
         self.assertEqual(recommendation.product_id, 3)
         self.assertEqual(recommendation.recommend_product_id, 4)
@@ -154,6 +155,17 @@ class TestRecommendations(unittest.TestCase):
         data = "this is not a dictionary"
         recommendation = Recommendation()
         self.assertRaises(DataValidationError, recommendation.deserialize, data)
+
+    def test_find_recommendation(self):
+        """ Find a Recommendation by ID """
+        Recommendation(customer_id=2, product_id=3, recommend_product_id=4, recommend_type="upscale").save()
+        recc = Recommendation(customer_id=5, product_id=6, recommend_product_id=7, recommend_type="downscale")
+        recc.save()
+        recommendation = Recommendation.find(recc.id)
+        self.assertIsNot(recommendation, None)
+        self.assertEqual(recommendation.id, recc.id)
+        self.assertEqual(recommendation.product_id, 6)
+        self.assertEqual(recommendation.customer_id, 5)
 
     def test_find_by_product_id(self):
         """ Find Recommendation by product_id """

@@ -28,6 +28,7 @@ from service.models import Recommendation, DataValidationError
 # Import Flask application
 from . import app
 
+
 # #####################################################################
 # RETRIEVE A RECOMMENDATION
 # #####################################################################
@@ -35,7 +36,7 @@ from . import app
 def get_recommendations(rec_id):
     """
     Retrieve a single Recommendation
-
+	
     This endpoint will return a Recommendation based on it's id
     """
     app.logger.info('Request for recommendation with id: %s', rec_id)
@@ -65,6 +66,7 @@ def create_recommendations():
                          {
                              'Location': location_url
                          })
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

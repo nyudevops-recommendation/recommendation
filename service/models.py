@@ -35,11 +35,9 @@ from flask_sqlalchemy import SQLAlchemy
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
 
-
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
     pass
-
 
 class Recommendation(db.Model):
     """
@@ -50,11 +48,14 @@ class Recommendation(db.Model):
     """
     logger = logging.getLogger('flask.app')
     app = None
+	
+	
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer)
     customer_id = db.Column(db.Integer)
     recommend_type = db.Column(db.String(63))
     recommend_product_id = db.Column(db.Integer)
+	
 
     def save(self):
         """
@@ -87,9 +88,8 @@ class Recommendation(db.Model):
             data (dict): A dictionary containing the Recommendation data
         """
         try:
-            self.id = data['id']
-            self.customer_id = data['customer_id']
             self.product_id = data['product_id']
+            self.customer_id = data['customer_id']
             self.recommend_type = data['recommend_type']
             self.recommend_product_id = data['recommend_product_id']
         except KeyError as error:
