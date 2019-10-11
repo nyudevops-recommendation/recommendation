@@ -57,9 +57,6 @@ class Recommendation(db.Model):
     recommend_product_id = db.Column(db.Integer)
 	
 
-    def __repr__(self):
-        return '<Recommendation %r>' % (self.product_id)
-	
     def save(self):
         """
         Saves a Recommendation to the data store
@@ -91,7 +88,6 @@ class Recommendation(db.Model):
             data (dict): A dictionary containing the Recommendation data
         """
         try:
-            #self.id = data['id']
             self.product_id = data['product_id']
             self.customer_id = data['customer_id']
             self.recommend_type = data['recommend_type']
