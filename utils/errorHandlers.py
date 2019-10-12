@@ -18,7 +18,7 @@ from flask_api import status    # HTTP Status Codes
 from service.models import DataValidationError
 
 # Import Flask application
-from . import app
+from service import app
 
 ######################################################################
 # Error Handlers
