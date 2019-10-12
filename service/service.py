@@ -101,11 +101,11 @@ def query_recommendations():
         recommendations = Recommendation.find_by_customer_id(customer_id)
     elif recommend_type:
         recommendations = Recommendation.find_by_recommend_type(recomend_type)
-    elif product_id, customer_id:
+    elif product_id and customer_id:
         recommendations = Recommendation.find_by_product_id(product_id).find_by_customer_id(customer_id)
-    elif product_id, recommend_type:
+    elif product_id and recommend_type:
         recommendations = Recommendation.find_by_product_id(product_id).find_by_recommend_type(recomend_type)
-    elif customer_id, recommend_type:
+    elif customer_id and recommend_type:
         recommendations = Recommendation.find_by_customer_id(product_id).find_by_recommend_type(recomend_type)
     else:
         recommendations = Recommendation.find_by_customer_id(product_id).find_by_customer_id(customer_id).find_by_recommend_type(recomend_type)
