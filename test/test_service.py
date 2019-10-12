@@ -140,3 +140,41 @@ class TestRecommendationServer(unittest.TestCase):
         resp = self.app.get('/recommendations/0')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_delete_recommendation(self):
+        """ Delete a Recommendation """
+        test_recommendation = self._create_recommendations(1)[0]
+        resp = self.app.delete('/recommendations/{}'.format(test_recommendation.id),
+                               content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+        # make sure they are deleted
+        resp = self.app.get('/recommendations/{}'.format(test_recommendation.id),
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_recommendation(self):
+        """ Update an existing Recommendation """
+        # create a recommendation to update
+        test_recommendation = RecommendationFactory()
+        resp = self.app.post('/recommendations',
+                             json=test_recommendation.serialize(),
+                             content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update the recommendation
+        test_recommendation = resp.get_json()
+        test_recommendation['recommend_type'] = 'unknown'
+        resp = self.app.put('/recommendations/{}'.format(test_recommendation['id']),
+                            json=test_recommendation,
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        updated_recommendation = resp.get_json()
+        self.assertEqual(updated_recommendation['recommend_type'], 'unknown')
+
+    def test_update_recommendation_not_found(self):
+        """ Update a Recommendation thats not found """
+        test_recommendation = RecommendationFactory()
+        resp = self.app.put('/recommendations/0',
+                            json=test_recommendation.serialize(),
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
