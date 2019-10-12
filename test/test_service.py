@@ -169,3 +169,11 @@ class TestRecommendationServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_recommendation = resp.get_json()
         self.assertEqual(updated_recommendation['recommend_type'], 'unknown')
+
+    def test_update_recommendation_not_found(self):
+        """ Update a Recommendation thats not found """
+        test_recommendation = RecommendationFactory()
+        resp = self.app.put('/recommendations/0',
+                            json=test_recommendation.serialize(),
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
