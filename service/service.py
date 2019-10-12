@@ -79,29 +79,6 @@ def create_recommendations():
                          {
                              'Location': location_url
                          })
-# #####################################################################
-# QUERY BY PRODUCT ID, CUSTOMER ID, RECOMMEND TYPE
-# #####################################################################
-@app.route('/recommendations', methods=['GET'])
-def query_recommendations(product_id):
-    """
-    Retrieve Recommendations based on product_id
-    
-    This endpoint will return Recommendations based on their product_id
-    """
-    app.logger.info('Request for recommendation with product_id')
-    recommendations = []
-    product_id = request.args.get('product_id')
-    customer_id = request.args.get('customer_id')
-    recommend_type = request.args.get('recommend_type')
-    if product_id:
-        recommendations = Recommendation.find_by_product_id(product_id)
-    elif customer_id:
-        recommendations = Recommendation.find_by_customer_id(customer_id)
-    else:
-        recommendations = Recommendation.find_by_recommend_type(recomend_type)
-    results = [recomendation.serialize() for recommendation in recommendations]
-    return make_response(jsonify(results), status.HTTP_200_OK)
     
 # #####################################################################
 # QUERY BY PRODUCT ID, CUSTOMER ID, RECOMMEND TYPE
