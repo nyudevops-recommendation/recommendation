@@ -147,3 +147,14 @@ class Recommendation(db.Model):
         """
         cls.logger.info('Processing recommend_type query for %s ...', recommend_type)
         return cls.query.filter(cls.recommend_type == recommend_type)
+
+    @classmethod
+    def find_by_specifc_info(cls, customer_id, product_id, recommend_type):
+        """ Returns all of the Recommendation in an recommend_type
+        Args:
+            product_id (string): the product_id of the Recommendation you want to match
+            customer_id (string): the customer_id of the Recommendation you want to match
+            recommend_type (string): the recommend_type of the Recommendation you want to match
+        """
+        cls.logger.info('Processing recommend_type query for %s, %s ...', product_id, customer_id)
+        return cls.query.filter(cls.product_id == product_id, cls.customer_id == customer_id, cls.recommend_type == recommend_type)

@@ -208,3 +208,17 @@ class TestRecommendations(unittest.TestCase):
         self.assertEqual(recommendations[0].product_id, 6)
         self.assertEqual(recommendations[0].recommend_product_id, 7)
         self.assertEqual(recommendations[0].recommend_type, "downscale")
+
+    def test_find_by_specifc_info(self):
+        """ Find Recommendation by customer_id, product_id, and recommend_type """
+        Recommendation(customer_id=5,
+                       product_id=3, recommend_product_id=4,
+                       recommend_type="upscale").save()
+        Recommendation(customer_id=5,
+                       product_id=6, recommend_product_id=7,
+                       recommend_type="downscale").save()
+        recommendations = Recommendation.find_by_specifc_info(5, 3, "upscale")
+        self.assertEqual(recommendations[0].customer_id, 5)
+        self.assertEqual(recommendations[0].product_id, 3)
+        self.assertEqual(recommendations[0].recommend_type, "upscale")
+        self.assertEqual(recommendations[0].recommend_product_id, 4)

@@ -59,6 +59,23 @@ def get_recommendations(rec_id):
         raise NotFound("Recommendation with id '{}' was not found.".format(rec_id))
     return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)
 
+# #####################################################################
+# QUERY A SPECIFIC RECOMMENDATION
+# #####################################################################
+@app.route('/recommendations/', methods=['GET'])
+def get_specifc_recommendation():
+    """
+    Retrieve a specific Recommendation
+    
+    This endpoint will return a Recommendation based on it's product_id, customer_id and recommend_type
+    """
+    app.logger.info('Request for specific recommendation')
+    product_id = request.args.get('product_id')
+    customer_id = request.args.get('customer_id')
+    recommend_type = request.args.get('recommend_type')
+    recommendations = Recommendation.find_by_specifc_info(customer_id, product_id, recommend_type)
+    results = [recommendation.serialize() for recommendation in recommendations]
+    return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################
 # ADD A NEW RECOMMENDATION

@@ -95,6 +95,15 @@ class TestRecommendationServer(unittest.TestCase):
         data = resp.get_json()
         self.assertEqual(data['id'], test_rec.id)
 
+    def test_get_specifc_recommendation(self):
+        """ Get a specific Recommendation """
+        # get the id of a recommendation
+        test_rec = self._create_recommendations(1)[0]
+        resp = self.app.get('/recommendations/?customer_id={}&product_id={}&recommend_type={}'
+                            .format(test_rec.customer_id, test_rec.product_id, test_rec.recommend_type),
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
     def test_create_recommendation(self):
         """ Create a new Recommendation """
         test_recommendation = RecommendationFactory()
