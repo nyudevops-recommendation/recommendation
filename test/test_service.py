@@ -84,6 +84,7 @@ class TestRecommendationServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(len(data), 5)
+        test_recommendation = self._create_recommendations(5)[0]
 		
     def test_get_recommendation(self):
         """ Get a single Recommendation """
@@ -138,3 +139,4 @@ class TestRecommendationServer(unittest.TestCase):
         """ Get a Recommendation thats not found """
         resp = self.app.get('/recommendations/0')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
