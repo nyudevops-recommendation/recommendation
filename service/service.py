@@ -13,21 +13,19 @@
 # limitations under the License.
 
 
-import os
 import sys
 import logging
-from flask import Flask, jsonify, request, url_for, make_response, abort
+from flask import jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
 from werkzeug.exceptions import NotFound
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
-from flask_sqlalchemy import SQLAlchemy
-from service.models import Recommendation, DataValidationError
+from service.models import Recommendation
+
 
 # Import Flask application
-from . import app
-
+from service import app
 
 ######################################################################
 # LIST ALL RECOMMENDATIONS
