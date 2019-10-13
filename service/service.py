@@ -16,30 +16,35 @@
 import sys
 import logging
 from flask import jsonify, request, url_for, make_response, abort
-from flask_api import status    # HTTP Status Codes
+from flask_api import status  # HTTP Status Codes
 from werkzeug.exceptions import NotFound
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
 from service.models import Recommendation
 
-
 # Import Flask application
 from service import app
 
+
 ######################################################################
-# LIST ALL RECOMMENDATIONS
+# LIST AND QUERY RECOMMENDATIONS
 ######################################################################
 @app.route('/recommendations', methods=['GET'])
 def list_recommendations():
-    """ Returns all Recommendations """
-    app.logger.info('Request for recommendation list')
-    recommendations = []
-    recommendations = Recommendation.all()
-
+    """ List all Recommendations given some attributes """
+    app.logger.info('Request for recommendation with product_id, customer_id, recommend_type')
+    product_id = request.args.get('product_id')
+    customer_id = request.args.get('customer_id')
+    recommend_type = request.args.get('recommend_type')
+    recommendations = Recommendation.find_by_attributes(product_id, customer_id, recommend_type)
+    if not recommendations:
+        raise NotFound("Recommendation with product_id {}, customer_id {}, recommend_type {} was not found."
+                       .format(product_id, customer_id, recommend_type))
     results = [recommendation.serialize() for recommendation in recommendations]
     return make_response(jsonify(results), status.HTTP_200_OK)
-	
+
+
 # #####################################################################
 # RETRIEVE A RECOMMENDATION
 # #####################################################################
@@ -77,38 +82,7 @@ def create_recommendations():
                          {
                              'Location': location_url
                          })
-    
-# #####################################################################
-# QUERY BY PRODUCT ID, CUSTOMER ID, RECOMMEND TYPE
-# #####################################################################
-@app.route('/recommendations', methods=['GET'])
-def query_recommendations():
-    """
-    Retrieve Recommendations based on product_id, customer_id, recommend_type
-    
-    This endpoint will return Recommendations based on their product_id, customer_id, recommend_type
-    """
-    app.logger.info('Request for recommendation with product_id, customer_id, recommend_type')
-    recommendations = []
-    product_id = request.args.get('product_id')
-    customer_id = request.args.get('customer_id')
-    recommend_type = request.args.get('recommend_type')
-    if product_id:
-        recommendations = Recommendation.find_by_product_id(product_id)
-    elif customer_id:
-        recommendations = Recommendation.find_by_customer_id(customer_id)
-    elif recommend_type:
-        recommendations = Recommendation.find_by_recommend_type(recomend_type)
-    elif product_id and customer_id:
-        recommendations = Recommendation.find_by_product_id(product_id).find_by_customer_id(customer_id)
-    elif product_id and recommend_type:
-        recommendations = Recommendation.find_by_product_id(product_id).find_by_recommend_type(recomend_type)
-    elif customer_id and recommend_type:
-        recommendations = Recommendation.find_by_customer_id(product_id).find_by_recommend_type(recomend_type)
-    else:
-        recommendations = Recommendation.find_by_customer_id(product_id).find_by_customer_id(customer_id).find_by_recommend_type(recomend_type)
-    results = [recomendation.serialize() for recommendation in recommendations]
-    return make_response(jsonify(results), status.HTTP_200_OK)
+
 
 ######################################################################
 # DELETE A RECOMMENDATION
@@ -127,6 +101,7 @@ def delete_recommendations(rec_id):
     if recommendation:
         recommendation.delete()
     return make_response('', status.HTTP_204_NO_CONTENT)
+
 
 ######################################################################
 # UPDATE AN EXISTING RECOMMENDATION
@@ -148,6 +123,7 @@ def update_recommendations(rec_id):
     recommendation.save()
     return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)
 
+
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
@@ -157,12 +133,14 @@ def init_db():
     global app
     Recommendation.init_db(app)
 
+
 def check_content_type(content_type):
     """ Checks that the media type is correct """
     if request.headers['Content-Type'] == content_type:
         return
     app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
     abort(415, 'Content-Type must be {}'.format(content_type))
+
 
 def initialize_logging(log_level=logging.INFO):
     """ Initialized the default logging to STDOUT """

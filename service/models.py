@@ -147,3 +147,22 @@ class Recommendation(db.Model):
         """
         cls.logger.info('Processing recommend_type query for %s ...', recommend_type)
         return cls.query.filter(cls.recommend_type == recommend_type)
+
+    @classmethod
+    def find_by_attributes(cls, product_id, customer_id, recommend_type):
+        """ Returns all of the Recommendation with specific attributes
+        Args:
+            :param recommend_type: query by recommend_type
+            :param customer_id: query by customer_id
+            :param product_id: query by product_id
+        """
+        cls.logger.info('Processing query for product_id: %s, customer_id: %s, recommend_type: %s ...',
+                        product_id, customer_id, recommend_type)
+        result = cls.query
+        if product_id:
+            result = result.filter(cls.product_id == product_id)
+        if customer_id:
+            result = result.filter(cls.customer_id == customer_id)
+        if recommend_type:
+            result = result.filter(cls.recommend_type == recommend_type)
+        return result.all()
