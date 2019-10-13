@@ -172,6 +172,7 @@ class TestRecommendationServer(unittest.TestCase):
         self.assertEqual(updated_recommendation['recommend_type'], 'unknown')
 
     def test_update_recommendation_not_found(self):
+        """ Update a Recommendation thats not found """
         test_recommendation = RecommendationFactory()
         resp = self.app.put('/recommendations/0',
                             json=test_recommendation.serialize(),
