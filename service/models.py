@@ -32,9 +32,10 @@ recommend_product_id (int) - the identity of recommended product
 import logging
 from flask_sqlalchemy import SQLAlchemy
 
+# pylint: disable=no-member
+
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
-
 
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
@@ -168,7 +169,8 @@ class Recommendation(db.Model):
             :param customer_id: query by customer_id
             :param product_id: query by product_id
         """
-        cls.logger.info('Processing query for product_id: %s, customer_id: %s, recommend_type: %s ...',
+        cls.logger.info('Processing query for product_id: %s, '
+                        'customer_id: %s, recommend_type: %s ...',
                         product_id, customer_id, recommend_type)
         result = cls.query
         if product_id:

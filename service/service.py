@@ -20,11 +20,13 @@ from werkzeug.exceptions import NotFound
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
-from service.models import Recommendation, DataValidationError
+from service.models import Recommendation
 
 # Import Flask application
 from service import app
 from utils import errorHandlers
+
+# pylint: disable=no-member
 
 ######################################################################
 # GET INDEX
@@ -50,7 +52,8 @@ def list_recommendations():
     recommend_type = request.args.get('recommend_type')
     recommendations = Recommendation.find_by_attributes(product_id, customer_id, recommend_type)
     if not recommendations:
-        raise NotFound("Recommendation with product_id {}, customer_id {}, recommend_type {} was not found."
+        raise NotFound("Recommendation with product_id {}, "
+                       "customer_id {}, recommend_type {} was not found."
                        .format(product_id, customer_id, recommend_type))
     results = [recommendation.serialize() for recommendation in recommendations]
     return make_response(jsonify(results), status.HTTP_200_OK)
@@ -63,7 +66,6 @@ def list_recommendations():
 def get_recommendations(rec_id):
     """
     Retrieve a single Recommendation
-	
     This endpoint will return a Recommendation based on it's id
     """
     app.logger.info('Request for recommendation with id: %s', rec_id)
@@ -143,7 +145,6 @@ def init_db():
     """ Initialies the SQLAlchemy app """
     global app
     Recommendation.init_db(app)
-
 
 def check_content_type(content_type):
     """ Checks that the media type is correct """
