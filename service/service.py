@@ -26,6 +26,17 @@ from service.models import Recommendation, DataValidationError
 from service import app
 from utils import errorHandlers
 
+######################################################################
+# GET INDEX
+######################################################################
+@app.route('/')
+def index():
+    """ Root URL response """
+    return jsonify(name='Recommendation Demo REST API Service',
+                   version='1.0',
+                   paths=url_for('list_recommendations', _external=True)
+                  ), status.HTTP_200_OK
+
 
 ######################################################################
 # LIST AND QUERY RECOMMENDATIONS
