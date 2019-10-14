@@ -189,7 +189,7 @@ class TestRecommendationServer(unittest.TestCase):
     def test_query_recommendation(self):
         """ Query by customer_id and product_id """
         test_rec = self._create_recommendations(5)[0]
-        resp = self.app.get('/recommendations?product_id={}&customer_id={}'.format(test_rec.product_id, test_rec.customer_id))
+        resp = self.app.get('/recommendations?product-id={}&customer-id={}'.format(test_rec.product_id, test_rec.customer_id))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()[0]
         self.assertEqual(data['recommend_type'], test_rec.recommend_type)
@@ -197,7 +197,7 @@ class TestRecommendationServer(unittest.TestCase):
     def test_query_recommendation_multiple_entries(self):
         """ Query by an specific recommend_type return multiple entries"""
         self._create_recommendations(10)
-        resp = self.app.get('/recommendations?recommend_type={}'.format("upsale"))
+        resp = self.app.get('/recommendations?recommend-type={}'.format("upsell"))
         data = resp.get_json()
         self.assertEqual(resp.status_code,status.HTTP_200_OK)
         self.assertGreater(len(data), 0)
@@ -205,5 +205,5 @@ class TestRecommendationServer(unittest.TestCase):
     def test_query_recommendation_not_found(self):
         """ Query by an non-exist recommend_type """
         self._create_recommendations(5)
-        resp = self.app.get('/recommendations?recommend_type={}'.format("a_strange_type"))
+        resp = self.app.get('/recommendations?recommend-type={}'.format("a_strange_type"))
         self.assertEqual(resp.status_code,status.HTTP_404_NOT_FOUND)

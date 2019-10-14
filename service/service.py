@@ -47,9 +47,9 @@ def index():
 def list_recommendations():
     """ List all Recommendations given some attributes """
     app.logger.info('Request for recommendation with product_id, customer_id, recommend_type')
-    product_id = request.args.get('product_id')
-    customer_id = request.args.get('customer_id')
-    recommend_type = request.args.get('recommend_type')
+    product_id = request.args.get('product-id')
+    customer_id = request.args.get('customer-id')
+    recommend_type = request.args.get('recommend-type')
     recommendations = Recommendation.find_by_attributes(product_id, customer_id, recommend_type)
     if not recommendations:
         raise NotFound("Recommendation with product_id {}, "
