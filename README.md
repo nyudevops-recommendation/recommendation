@@ -29,6 +29,7 @@ then on your own machine, visit: http://localhost:5000/
 ## To send out pull requests
 
 ```
+git pull
 git checkout -b my-branch
 ```
 (add/modify something)
