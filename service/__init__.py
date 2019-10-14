@@ -23,6 +23,8 @@ import sys
 import logging
 from flask import Flask
 
+# pylint: disable=no-member
+
 # Get configuration from environment
 DATABASE_URI = os.getenv('DATABASE_URI', 'postgres://postgres:postgres@localhost:5432/postgres')
 SECRET_KEY = os.getenv('SECRET_KEY', 's3cr3t-key-shhhh')
