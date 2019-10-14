@@ -35,9 +35,11 @@ from flask_sqlalchemy import SQLAlchemy
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
 
+
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
     pass
+
 
 class Recommendation(db.Model):
     """
@@ -48,14 +50,12 @@ class Recommendation(db.Model):
     """
     logger = logging.getLogger('flask.app')
     app = None
-	
-	
+
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer)
     customer_id = db.Column(db.Integer)
     recommend_type = db.Column(db.String(63))
     recommend_product_id = db.Column(db.Integer)
-	
 
     def save(self):
         """
@@ -108,6 +108,18 @@ class Recommendation(db.Model):
         db.init_app(app)
         app.app_context().push()
         db.create_all()  # make our sqlalchemy tables
+        Recommendation(customer_id=2,
+                       product_id=3,
+                       recommend_product_id=4,
+                       recommend_type="upsale").save()
+        Recommendation(customer_id=5,
+                       product_id=6,
+                       recommend_product_id=7,
+                       recommend_type="downsale").save()
+        Recommendation(customer_id=5,
+                       product_id=6,
+                       recommend_product_id=8,
+                       recommend_type="upsale").save()
 
     @classmethod
     def all(cls):

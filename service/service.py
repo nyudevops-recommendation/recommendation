@@ -1,4 +1,3 @@
-# Copyright 2016, 2019 John J. Rofrano. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,10 +20,11 @@ from werkzeug.exceptions import NotFound
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
-from service.models import Recommendation
+from service.models import Recommendation, DataValidationError
 
 # Import Flask application
 from service import app
+from utils import errorHandlers
 
 
 ######################################################################

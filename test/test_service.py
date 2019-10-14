@@ -187,10 +187,10 @@ class TestRecommendationServer(unittest.TestCase):
         data = resp.get_json()[0]
         self.assertEqual(data['recommend_type'], test_rec.recommend_type)
 
-    def test_query_recommendation_not_found(self):
+    def test_query_recommendation_multiple_entries(self):
         """ Query by an specific recommend_type return multiple entries"""
         self._create_recommendations(10)
-        resp = self.app.get('/recommendations?recommend_type={}'.format("upscale"))
+        resp = self.app.get('/recommendations?recommend_type={}'.format("upsale"))
         data = resp.get_json()
         self.assertEqual(resp.status_code,status.HTTP_200_OK)
         self.assertGreater(len(data), 0)
