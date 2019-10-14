@@ -5,7 +5,7 @@
 The recommendations resource is a representation a product recommendation based on another product. In essence it is just a relationship between two products that "go together" (e.g., radio and batteries, printers and ink, shirts and pants, etc.). It could also recommend based on what other customers have purchased like "customers who bought item A usually buy item B". Recommendations should have a recommendation type like cross-sell, upsell, accessory, etc. This way a product page could request all of the up-sells for a product.   
 
 ## API routes
-
+- **root:** HTTP GET /
 - **list:** HTTP GET /recommendations
 - **query:** HTTP GET /recommendations?product-id={product_id}&customer-id={customer_id}&recommend-type={recommend_type}
 - **read:** HTTP GET /recommendations/{id}
