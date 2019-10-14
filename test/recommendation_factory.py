@@ -29,7 +29,7 @@ class RecommendationFactory(factory.Factory):
     id = factory.Sequence(lambda n: n)
     product_id = factory.Sequence(lambda n: n + 1)
     customer_id = factory.Sequence(lambda n: n + 2)
-    recommend_type = FuzzyChoice(choices=["upsale", "cross-sell", "accessory"])
+    recommend_type = FuzzyChoice(choices=["upsale", "crosssell", "accessory", "downsale"])
     recommend_product_id = factory.Sequence(lambda n: n + 3)
 
 

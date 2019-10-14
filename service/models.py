@@ -35,9 +35,11 @@ from flask_sqlalchemy import SQLAlchemy
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
 
+
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
     pass
+
 
 class Recommendation(db.Model):
     """
@@ -48,14 +50,12 @@ class Recommendation(db.Model):
     """
     logger = logging.getLogger('flask.app')
     app = None
-	
-	
+
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer)
     customer_id = db.Column(db.Integer)
     recommend_type = db.Column(db.String(63))
     recommend_product_id = db.Column(db.Integer)
-	
 
     def save(self):
         """
@@ -108,6 +108,18 @@ class Recommendation(db.Model):
         db.init_app(app)
         app.app_context().push()
         db.create_all()  # make our sqlalchemy tables
+        Recommendation(customer_id=2,
+                       product_id=3,
+                       recommend_product_id=4,
+                       recommend_type="upsale").save()
+        Recommendation(customer_id=5,
+                       product_id=6,
+                       recommend_product_id=7,
+                       recommend_type="downsale").save()
+        Recommendation(customer_id=5,
+                       product_id=6,
+                       recommend_product_id=8,
+                       recommend_type="upsale").save()
 
     @classmethod
     def all(cls):
@@ -147,3 +159,22 @@ class Recommendation(db.Model):
         """
         cls.logger.info('Processing recommend_type query for %s ...', recommend_type)
         return cls.query.filter(cls.recommend_type == recommend_type)
+
+    @classmethod
+    def find_by_attributes(cls, product_id, customer_id, recommend_type):
+        """ Returns all of the Recommendation with specific attributes
+        Args:
+            :param recommend_type: query by recommend_type
+            :param customer_id: query by customer_id
+            :param product_id: query by product_id
+        """
+        cls.logger.info('Processing query for product_id: %s, customer_id: %s, recommend_type: %s ...',
+                        product_id, customer_id, recommend_type)
+        result = cls.query
+        if product_id:
+            result = result.filter(cls.product_id == product_id)
+        if customer_id:
+            result = result.filter(cls.customer_id == customer_id)
+        if recommend_type:
+            result = result.filter(cls.recommend_type == recommend_type)
+        return result.all()

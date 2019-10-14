@@ -84,7 +84,7 @@ class TestRecommendationServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(len(data), 5)
-		
+
     def test_get_recommendation(self):
         """ Get a single Recommendation """
         # get the id of a recommendation
@@ -151,6 +151,7 @@ class TestRecommendationServer(unittest.TestCase):
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+
     def test_update_recommendation(self):
         """ Update an existing Recommendation """
         # create a recommendation to update
@@ -177,3 +178,25 @@ class TestRecommendationServer(unittest.TestCase):
                             json=test_recommendation.serialize(),
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_query_recommendation(self):
+        """ Query by customer_id and product_id """
+        test_rec = self._create_recommendations(5)[0]
+        resp = self.app.get('/recommendations?product_id={}&customer_id={}'.format(test_rec.product_id, test_rec.customer_id))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()[0]
+        self.assertEqual(data['recommend_type'], test_rec.recommend_type)
+
+    def test_query_recommendation_multiple_entries(self):
+        """ Query by an specific recommend_type return multiple entries"""
+        self._create_recommendations(10)
+        resp = self.app.get('/recommendations?recommend_type={}'.format("upsale"))
+        data = resp.get_json()
+        self.assertEqual(resp.status_code,status.HTTP_200_OK)
+        self.assertGreater(len(data), 0)
+
+    def test_query_recommendation_not_found(self):
+        """ Query by an non-exist recommend_type """
+        self._create_recommendations(5)
+        resp = self.app.get('/recommendations?recommend_type={}'.format("a_strange_type"))
+        self.assertEqual(resp.status_code,status.HTTP_404_NOT_FOUND)
