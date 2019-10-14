@@ -7,12 +7,12 @@ The recommendations resource is a representation a product recommendation based 
 ## API routes
 
 - **list:** HTTP GET /recommendations
-- **read:** HTTP GET /recommendations/{rec-id}
-- **query:** HTTP GET /recommendations?product-id=123&type=upscale&customer-id=111
+- **query:** HTTP GET /recommendations?product-id={product_id}&customer-id={customer_id}&recommend-type={recommend_type}
+- **read:** HTTP GET /recommendations/{id}
 - **create:** HTTP POST /recommendations 
-- **update:** HTTP PUT /recommendations/{rec-id}
-- **delete:** HTTP DELETE /recommendations/{rec-id}
-- **success:** HTTP PUT /recommendations/{rec-id}/success
+- **update:** HTTP PUT /recommendations/{id}
+- **delete:** HTTP DELETE /recommendations/{id}
+- **success:** HTTP PUT /recommendations/{id}/success
 
 
 ## To run the Flask app 
