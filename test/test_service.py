@@ -24,11 +24,12 @@ Test cases can be run with the following:
 import unittest
 import os
 import logging
-from flask_api import status  # HTTP Status Codes
 from unittest.mock import MagicMock, patch
+from flask_api import status  # HTTP Status Codes
 from service.models import Recommendation, DataValidationError, db
-from .recommendation_factory import RecommendationFactory
 from service.service import app, init_db, initialize_logging
+from .recommendation_factory import RecommendationFactory
+
 
 # DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
 DATABASE_URI = os.getenv('DATABASE_URI', 'postgres://postgres:passw0rd@localhost:5432/postgres')
@@ -62,7 +63,7 @@ class TestRecommendationServer(unittest.TestCase):
     def tearDown(self):
         db.session.remove()
         db.drop_all()
-        
+
     def test_index(self):
         """ Test the Home Page """
         resp = self.app.get('/')
@@ -78,12 +79,13 @@ class TestRecommendationServer(unittest.TestCase):
             resp = self.app.post('/recommendations',
                                  json=test_recommendation.serialize(),
                                  content_type='application/json')
-            self.assertEqual(resp.status_code, status.HTTP_201_CREATED, 'Could not create test recommendation')
+            self.assertEqual(resp.status_code, status.HTTP_201_CREATED,
+                             'Could not create test recommendation')
             new_recommendation = resp.get_json()
             test_recommendation.id = new_recommendation['id']
             recommendations.append(test_recommendation)
         return recommendations
-		
+
     def test_get_recommendation_list(self):
         """ Get a list of Recommendations """
         self._create_recommendations(5)
@@ -111,14 +113,17 @@ class TestRecommendationServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # Make sure location header is set
         location = resp.headers.get('Location', None)
-        self.assertTrue(location != None)
+        self.assertTrue(location is not None)
         # Check the data is correct
         new_recommendation = resp.get_json()
-        self.assertEqual(new_recommendation['product_id'], test_recommendation.product_id, "product_id do not match")
-        self.assertEqual(new_recommendation['customer_id'], test_recommendation.customer_id, "customer_id do not match")
-        self.assertEqual(new_recommendation['recommend_type'], test_recommendation.recommend_type,
-                         "product_type does not match")
-        self.assertEqual(new_recommendation['recommend_product_id'], test_recommendation.recommend_product_id,
+        self.assertEqual(new_recommendation['product_id'],
+                         test_recommendation.product_id, "product_id do not match")
+        self.assertEqual(new_recommendation['customer_id'],
+                         test_recommendation.customer_id, "customer_id do not match")
+        self.assertEqual(new_recommendation['recommend_type'],
+                         test_recommendation.recommend_type, "product_type does not match")
+        self.assertEqual(new_recommendation['recommend_product_id'],
+                         test_recommendation.recommend_product_id,
                          "recommend_product_id does not match")
 
         # Check that the location header was correct
@@ -126,11 +131,14 @@ class TestRecommendationServer(unittest.TestCase):
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_recommendation = resp.get_json()
-        self.assertEqual(new_recommendation['product_id'], test_recommendation.product_id, "product_id do not match")
-        self.assertEqual(new_recommendation['customer_id'], test_recommendation.customer_id, "customer_id do not match")
-        self.assertEqual(new_recommendation['recommend_type'], test_recommendation.recommend_type,
-                         "product_type does not match")
-        self.assertEqual(new_recommendation['recommend_product_id'], test_recommendation.recommend_product_id,
+        self.assertEqual(new_recommendation['product_id'],
+                         test_recommendation.product_id, "product_id do not match")
+        self.assertEqual(new_recommendation['customer_id'],
+                         test_recommendation.customer_id, "customer_id do not match")
+        self.assertEqual(new_recommendation['recommend_type'],
+                         test_recommendation.recommend_type, "product_type does not match")
+        self.assertEqual(new_recommendation['recommend_product_id'],
+                         test_recommendation.recommend_product_id,
                          "recommend_product_id does not match")
 
     def test_create_recommendation_bad_content_type(self):
@@ -140,7 +148,7 @@ class TestRecommendationServer(unittest.TestCase):
                              json=test_recommendation.serialize(),
                              content_type="a_bad_type")
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-		
+
     def test_get_recommendation_not_found(self):
         """ Get a Recommendation thats not found """
         resp = self.app.get('/recommendations/0')
@@ -189,7 +197,8 @@ class TestRecommendationServer(unittest.TestCase):
     def test_query_recommendation(self):
         """ Query by customer_id and product_id """
         test_rec = self._create_recommendations(5)[0]
-        resp = self.app.get('/recommendations?product-id={}&customer-id={}'.format(test_rec.product_id, test_rec.customer_id))
+        resp = self.app.get('/recommendations?product-id={}&customer-id={}'\
+        .format(test_rec.product_id, test_rec.customer_id))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()[0]
         self.assertEqual(data['recommend_type'], test_rec.recommend_type)
@@ -199,11 +208,11 @@ class TestRecommendationServer(unittest.TestCase):
         self._create_recommendations(10)
         resp = self.app.get('/recommendations?recommend-type={}'.format("upsell"))
         data = resp.get_json()
-        self.assertEqual(resp.status_code,status.HTTP_200_OK)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertGreater(len(data), 0)
 
     def test_query_recommendation_not_found(self):
         """ Query by an non-exist recommend_type """
         self._create_recommendations(5)
         resp = self.app.get('/recommendations?recommend-type={}'.format("a_strange_type"))
-        self.assertEqual(resp.status_code,status.HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)

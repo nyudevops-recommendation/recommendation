@@ -71,7 +71,7 @@ class TestRecommendations(unittest.TestCase):
         recommendation = Recommendation(customer_id=2,
                                         product_id=3, recommend_product_id=4,
                                         recommend_type="upsell")
-        self.assertTrue(recommendation != None)
+        self.assertTrue(recommendation is not None)
         self.assertEqual(recommendation.id, None)
         recommendation.save()
         # Asert that it was assigned an id and shows up in the database
@@ -128,7 +128,8 @@ class TestRecommendations(unittest.TestCase):
 
     def test_deserialize_a_recommendation(self):
         """ Test deserialization of a Recommendation """
-        data = {"id": 1, "customer_id": 2, "product_id": 3, "recommend_product_id": 4, "recommend_type": "upsell"}
+        data = {"id": 1, "customer_id": 2,\
+         "product_id": 3, "recommend_product_id": 4, "recommend_type": "upsell"}
         recommendation = Recommendation()
         recommendation.deserialize(data)
         self.assertNotEqual(recommendation, None)
@@ -158,8 +159,10 @@ class TestRecommendations(unittest.TestCase):
 
     def test_find_recommendation(self):
         """ Find a Recommendation by ID """
-        Recommendation(customer_id=2, product_id=3, recommend_product_id=4, recommend_type="upsell").save()
-        recc = Recommendation(customer_id=5, product_id=6, recommend_product_id=7, recommend_type="downsell")
+        Recommendation(customer_id=2, product_id=3, recommend_product_id=4,\
+        recommend_type="upsell").save()
+        recc = Recommendation(customer_id=5, product_id=6,\
+         recommend_product_id=7, recommend_type="downsell")
         recc.save()
         recommendation = Recommendation.find(recc.id)
         self.assertIsNot(recommendation, None)
