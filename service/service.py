@@ -1,4 +1,3 @@
-# Copyright 2016, 2019 John J. Rofrano. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,20 +12,51 @@
 # limitations under the License.
 
 
-import os
 import sys
 import logging
-from flask import Flask, jsonify, request, url_for, make_response, abort
-from flask_api import status    # HTTP Status Codes
+from flask import jsonify, request, url_for, make_response, abort
+from flask_api import status  # HTTP Status Codes
 from werkzeug.exceptions import NotFound
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
-from flask_sqlalchemy import SQLAlchemy
-from service.models import Recommendation, DataValidationError
+from service.models import Recommendation
 
 # Import Flask application
-from . import app
+from service import app
+from utils import errorHandlers
+
+# pylint: disable=no-member
+
+######################################################################
+# GET INDEX
+######################################################################
+@app.route('/')
+def index():
+    """ Root URL response """
+    return jsonify(name='Recommendation Demo REST API Service',
+                   version='1.0',
+                   paths=url_for('list_recommendations', _external=True)
+                  ), status.HTTP_200_OK
+
+
+######################################################################
+# LIST AND QUERY RECOMMENDATIONS
+######################################################################
+@app.route('/recommendations', methods=['GET'])
+def list_recommendations():
+    """ List all Recommendations given some attributes """
+    app.logger.info('Request for recommendation with product_id, customer_id, recommend_type')
+    product_id = request.args.get('product-id')
+    customer_id = request.args.get('customer-id')
+    recommend_type = request.args.get('recommend-type')
+    recommendations = Recommendation.find_by_attributes(product_id, customer_id, recommend_type)
+    if not recommendations:
+        raise NotFound("Recommendation with product_id {}, "
+                       "customer_id {}, recommend_type {} was not found."
+                       .format(product_id, customer_id, recommend_type))
+    results = [recommendation.serialize() for recommendation in recommendations]
+    return make_response(jsonify(results), status.HTTP_200_OK)
 
 
 # #####################################################################
@@ -36,7 +66,6 @@ from . import app
 def get_recommendations(rec_id):
     """
     Retrieve a single Recommendation
-	
     This endpoint will return a Recommendation based on it's id
     """
     app.logger.info('Request for recommendation with id: %s', rec_id)
@@ -69,6 +98,46 @@ def create_recommendations():
 
 
 ######################################################################
+# DELETE A RECOMMENDATION
+# HTTP DELETE /recommendations/{rec_id} - deletes a recommendation record in the database
+######################################################################
+
+@app.route('/recommendations/<int:rec_id>', methods=['DELETE'])
+def delete_recommendations(rec_id):
+    """
+    Delete a recommendation
+
+    This endpoint will delete a recommendation based the id specified in the path
+    """
+    app.logger.info('Request to delete recommendation with id: %s', rec_id)
+    recommendation = Recommendation.find(rec_id)
+    if recommendation:
+        recommendation.delete()
+    return make_response('', status.HTTP_204_NO_CONTENT)
+
+
+######################################################################
+# UPDATE AN EXISTING RECOMMENDATION
+# HTTP PUT /recommendations/{rec_id} - updates a recommendation record in the database
+######################################################################
+@app.route('/recommendations/<int:rec_id>', methods=['PUT'])
+def update_recommendations(rec_id):
+    """
+    Update a Recommendations
+    This endpoint will update a Recommendation based the body that is posted
+    """
+    app.logger.info('Request to update recommendation with id: %s', rec_id)
+    check_content_type('application/json')
+    recommendation = Recommendation.find(rec_id)
+    if not recommendation:
+        raise NotFound("Recommendation with id '{}' was not found.".format(rec_id))
+    recommendation.deserialize(request.get_json())
+    recommendation.id = rec_id
+    recommendation.save()
+    return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)
+
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
@@ -83,6 +152,7 @@ def check_content_type(content_type):
         return
     app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
     abort(415, 'Content-Type must be {}'.format(content_type))
+
 
 def initialize_logging(log_level=logging.INFO):
     """ Initialized the default logging to STDOUT """

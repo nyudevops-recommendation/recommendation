@@ -62,6 +62,13 @@ class TestRecommendationServer(unittest.TestCase):
     def tearDown(self):
         db.session.remove()
         db.drop_all()
+        
+    def test_index(self):
+        """ Test the Home Page """
+        resp = self.app.get('/')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data['name'], 'Recommendation Demo REST API Service')
 
     def _create_recommendations(self, count):
         """ Factory method to create recommendations in bulk """
@@ -77,6 +84,14 @@ class TestRecommendationServer(unittest.TestCase):
             recommendations.append(test_recommendation)
         return recommendations
 		
+    def test_get_recommendation_list(self):
+        """ Get a list of Recommendations """
+        self._create_recommendations(5)
+        resp = self.app.get('/recommendations')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 5)
+
     def test_get_recommendation(self):
         """ Get a single Recommendation """
         # get the id of a recommendation
@@ -130,3 +145,65 @@ class TestRecommendationServer(unittest.TestCase):
         """ Get a Recommendation thats not found """
         resp = self.app.get('/recommendations/0')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_recommendation(self):
+        """ Delete a Recommendation """
+        test_recommendation = self._create_recommendations(1)[0]
+        resp = self.app.delete('/recommendations/{}'.format(test_recommendation.id),
+                               content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+        # make sure they are deleted
+        resp = self.app.get('/recommendations/{}'.format(test_recommendation.id),
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+
+    def test_update_recommendation(self):
+        """ Update an existing Recommendation """
+        # create a recommendation to update
+        test_recommendation = RecommendationFactory()
+        resp = self.app.post('/recommendations',
+                             json=test_recommendation.serialize(),
+                             content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update the recommendation
+        test_recommendation = resp.get_json()
+        test_recommendation['recommend_type'] = 'unknown'
+        resp = self.app.put('/recommendations/{}'.format(test_recommendation['id']),
+                            json=test_recommendation,
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        updated_recommendation = resp.get_json()
+        self.assertEqual(updated_recommendation['recommend_type'], 'unknown')
+
+    def test_update_recommendation_not_found(self):
+        """ Update a Recommendation thats not found """
+        test_recommendation = RecommendationFactory()
+        resp = self.app.put('/recommendations/0',
+                            json=test_recommendation.serialize(),
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_query_recommendation(self):
+        """ Query by customer_id and product_id """
+        test_rec = self._create_recommendations(5)[0]
+        resp = self.app.get('/recommendations?product-id={}&customer-id={}'.format(test_rec.product_id, test_rec.customer_id))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()[0]
+        self.assertEqual(data['recommend_type'], test_rec.recommend_type)
+
+    def test_query_recommendation_multiple_entries(self):
+        """ Query by an specific recommend_type return multiple entries"""
+        self._create_recommendations(10)
+        resp = self.app.get('/recommendations?recommend-type={}'.format("upsell"))
+        data = resp.get_json()
+        self.assertEqual(resp.status_code,status.HTTP_200_OK)
+        self.assertGreater(len(data), 0)
+
+    def test_query_recommendation_not_found(self):
+        """ Query by an non-exist recommend_type """
+        self._create_recommendations(5)
+        resp = self.app.get('/recommendations?recommend-type={}'.format("a_strange_type"))
+        self.assertEqual(resp.status_code,status.HTTP_404_NOT_FOUND)
