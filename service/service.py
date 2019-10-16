@@ -88,6 +88,7 @@ def create_recommendations():
     check_content_type('application/json')
     recommendation = Recommendation()
     recommendation.deserialize(request.get_json())
+    recommendation.rec_success = 0
     recommendation.save()
     message = recommendation.serialize()
     location_url = url_for('get_recommendations', rec_id=recommendation.id, _external=True)
@@ -132,6 +133,26 @@ def update_recommendations(rec_id):
     if not recommendation:
         raise NotFound("Recommendation with id '{}' was not found.".format(rec_id))
     recommendation.deserialize(request.get_json())
+    recommendation.id = rec_id
+    recommendation.save()
+    return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)
+	
+######################################################################
+# INCREMENT SUCCESS COUNTER
+# HTTP PUT /recommendations/{rec_id} - increments the success counter of a given record
+######################################################################
+@app.route('/recommendations/<int:rec_id>/success', methods=['PUT'])
+def rec_success(rec_id):
+    """
+    Increment A Recommendation's Success field
+    """
+    app.logger.info('Increment success field for recommendation with id: %s', rec_id)
+    check_content_type('application/json')
+    recommendation = Recommendation.find(rec_id)
+    if not recommendation:
+        raise NotFound("Recommendation with id '{}' was not found.".format(rec_id))
+    count = recommendation.rec_success
+    recommendation.rec_success = count + 1
     recommendation.id = rec_id
     recommendation.save()
     return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)

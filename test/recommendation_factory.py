@@ -31,6 +31,7 @@ class RecommendationFactory(factory.Factory):
     customer_id = factory.Sequence(lambda n: n + 2)
     recommend_type = FuzzyChoice(choices=["upsell", "crosssell", "accessory", "downsell"])
     recommend_product_id = factory.Sequence(lambda n: n + 3)
+    rec_success = 0
 
 
 if __name__ == '__main__':
