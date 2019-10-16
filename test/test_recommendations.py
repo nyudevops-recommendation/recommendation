@@ -111,7 +111,8 @@ class TestRecommendations(unittest.TestCase):
         """ Test serialization of a Recommendation """
         recommendation = Recommendation(customer_id=2,
                                         product_id=3, recommend_product_id=4,
-                                        recommend_type="upsell")
+                                        recommend_type="upsell",
+                                        rec_success=9)
 
         data = recommendation.serialize()
         self.assertNotEqual(data, None)
@@ -125,6 +126,8 @@ class TestRecommendations(unittest.TestCase):
         self.assertEqual(data['recommend_product_id'], 4)
         self.assertIn('recommend_type', data)
         self.assertEqual(data['recommend_type'], "upsell")
+        self.assertIn('rec_success', data)
+        self.assertEqual(data['rec_success'], 9)
 
     def test_deserialize_a_recommendation(self):
         """ Test deserialization of a Recommendation """

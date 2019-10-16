@@ -116,14 +116,15 @@ class TestRecommendationServer(unittest.TestCase):
         self.assertTrue(location is not None)
         # Check the data is correct
         new_recommendation = resp.get_json()
-        self.assertEqual(new_recommendation['product_id'],
-                         test_recommendation.product_id, "product_id do not match")
-        self.assertEqual(new_recommendation['customer_id'],
-                         test_recommendation.customer_id, "customer_id do not match")
-        self.assertEqual(new_recommendation['recommend_type'],
-                         test_recommendation.recommend_type, "product_type does not match")
-        self.assertEqual(new_recommendation['recommend_product_id'],
-                         test_recommendation.recommend_product_id,
+
+        self.assertEqual(new_recommendation['product_id'], test_recommendation.product_id, "product_id do not match")
+        self.assertEqual(new_recommendation['customer_id'], test_recommendation.customer_id, "customer_id do not match")
+        self.assertEqual(new_recommendation['recommend_type'], test_recommendation.recommend_type,
+                         "product_type does not match")
+        self.assertEqual(new_recommendation['rec_success'], test_recommendation.rec_success,
+                         "rec_success does not match")
+        self.assertEqual(new_recommendation['recommend_product_id'], test_recommendation.recommend_product_id,
+>>>>>>> master
                          "recommend_product_id does not match")
 
         # Check that the location header was correct
@@ -185,6 +186,31 @@ class TestRecommendationServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_recommendation = resp.get_json()
         self.assertEqual(updated_recommendation['recommend_type'], 'unknown')
+		
+    def test_success(self):
+        """ Increment Success """
+        # create a recommendation to increment
+        test_recommendation = RecommendationFactory()
+        resp = self.app.post('/recommendations',
+                             json=test_recommendation.serialize(),
+                             content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # increment the recommendation
+        new_recommendation = resp.get_json()
+        resp = self.app.put('/recommendations/{}/success'.format(new_recommendation['id']),
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        updated_recommendation = resp.get_json()
+        self.assertEqual(updated_recommendation['rec_success'], 1)
+	
+    def test_success_not_found(self):	
+        """ Increment Success with bad id """
+        test_recommendation = RecommendationFactory()
+        resp = self.app.put('/recommendations/0/success',
+                            json=test_recommendation.serialize(),
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_update_recommendation_not_found(self):
         """ Update a Recommendation thats not found """

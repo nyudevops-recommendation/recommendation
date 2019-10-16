@@ -57,6 +57,7 @@ class Recommendation(db.Model):
     customer_id = db.Column(db.Integer)
     recommend_type = db.Column(db.String(63))
     recommend_product_id = db.Column(db.Integer)
+    rec_success = db.Column(db.Integer)
 
     def save(self):
         """
@@ -79,7 +80,8 @@ class Recommendation(db.Model):
                 "product_id": self.product_id,
                 "customer_id": self.customer_id,
                 "recommend_type": self.recommend_type,
-                "recommend_product_id": self.recommend_product_id}
+                "recommend_product_id": self.recommend_product_id,
+				"rec_success": self.rec_success}
 
     def deserialize(self, data):
         """
