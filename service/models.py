@@ -114,15 +114,18 @@ class Recommendation(db.Model):
         Recommendation(customer_id=2,
                        product_id=3,
                        recommend_product_id=4,
-                       recommend_type="upsell").save()
+                       recommend_type="upsell",
+                       rec_success=0).save()
         Recommendation(customer_id=5,
                        product_id=6,
                        recommend_product_id=7,
-                       recommend_type="downsell").save()
+                       recommend_type="downsell",
+                       rec_success=2).save()
         Recommendation(customer_id=5,
                        product_id=6,
                        recommend_product_id=8,
-                       recommend_type="upsell").save()
+                       recommend_type="upsell",
+                       rec_success=1).save()
 
     @classmethod
     def all(cls):
