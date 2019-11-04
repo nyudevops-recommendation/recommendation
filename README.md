@@ -1,7 +1,7 @@
 # Recommendations
 
 [![Build Status](https://travis-ci.org/nyudevops-recommendation/recommendations.svg?branch=master)](https://travis-ci.org/nyudevops-recommendation/recommendations)
-[![codecov](https://codecov.io/gh/qijinze911/recommendations/branch/master/graph/badge.svg)](https://codecov.io/gh/qijinze911/recommendations)
+[![codecov](https://codecov.io/gh/nyudevops-recommendation/recommendations/branch/master/graph/badge.svg)](https://codecov.io/gh/nyudevops-recommendation/recommendations)
 
 ## Description
 
