@@ -6,20 +6,15 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure(2) do |config|
-  # Every Vagrant development environment requires a box. You can search for
-  # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = "ubuntu/bionic64"
   config.vm.hostname = "ibmcloud"
 
   # Forward Flask and Kubernetes ports
   config.vm.network "forwarded_port", guest: 8001, host: 8001, host_ip: "127.0.0.1"
-  config.vm.network "forwarded_port", guest: 6000, host: 6000, host_ip: "127.0.1.1"
+  config.vm.network "forwarded_port", guest: 5000, host: 5000, host_ip: "127.0.0.1"
   config.vm.network "private_network", ip: "192.168.33.10"
 
-  # Provider-specific configuration so you can fine-tune various
-  # backing providers for Vagrant. These expose provider-specific options.
-  # Example for VirtualBox:
-  #
+  # Provider-specific configuration
   config.vm.provider "virtualbox" do |vb|
     # Customize the amount of memory on the VM:
     vb.memory = "1024"
@@ -34,7 +29,7 @@ Vagrant.configure(2) do |config|
     config.vm.provision "file", source: "~/.gitconfig", destination: "~/.gitconfig"
   end
 
-  # Copy the ssh keys into the vm for git access
+  # Copy your ssh keys for github so that your git credentials work
   if File.exists?(File.expand_path("~/.ssh/id_rsa"))
     config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
   end
@@ -47,14 +42,14 @@ Vagrant.configure(2) do |config|
     config.vm.provision "file", source: "~/.bluemix/apiKey.json", destination: "~/.bluemix/apiKey.json"
   end
 
-  # Copy your .vimrc file so that your vi looks like you expect
+  # Copy your .vimrc file so that your VI editor looks right
   if File.exists?(File.expand_path("~/.vimrc"))
     config.vm.provision "file", source: "~/.vimrc", destination: "~/.vimrc"
   end
 
-  # Enable provisioning with a shell script. Additional provisioners such as
-  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
-  # documentation for more information about their specific syntax and use.
+  ######################################################################
+  # Setup a Python 3 development environment
+  ######################################################################
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
     apt-get install -y git zip tree python3 python3-pip python3-venv
@@ -66,13 +61,13 @@ Vagrant.configure(2) do |config|
   SHELL
 
   ######################################################################
-  # Add PostgreSQL docker container
+  # Add CouchDB docker container
   ######################################################################
-  # docker run -d --name postgres -p 5432:5432 -v psql_data:/var/lib/postgresql/data postgres
-  config.vm.provision :docker do |d|
-    d.pull_images "postgres:alpine"
-    d.run "postgres:alpine",
-       args: "-d --name postgres -p 5432:5432 -v psql_data:/var/lib/postgresql/data"
+  # docker run -d --name couchdb -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass couchdb
+  config.vm.provision "docker" do |d|
+    d.pull_images "couchdb"
+    d.run "couchdb",
+      args: "--restart=always -d --name couchdb -p 5984:5984 -v couchdb:/opt/couchdb/data -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass"
   end
 
   ######################################################################
