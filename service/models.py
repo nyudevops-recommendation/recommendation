@@ -33,8 +33,6 @@ import logging
 import os
 from flask_sqlalchemy import SQLAlchemy
 
-DATABASE_URI = os.getenv('DATABASE_URI', 'postgres://postgres:passw0rd@localhost:5432/postgres')
-
 # pylint: disable=no-member
 
 # Create the SQLAlchemy object to be initialized later in init_db()
@@ -114,21 +112,21 @@ class Recommendation(db.Model):
         db.init_app(app)
         app.app_context().push()
         db.create_all()  # make our sqlalchemy tables
-        Recommendation(customer_id=2,
-                       product_id=3,
-                       recommend_product_id=4,
-                       recommend_type="upsell",
-                       rec_success=0).save()
-        Recommendation(customer_id=5,
-                       product_id=6,
-                       recommend_product_id=7,
-                       recommend_type="downsell",
-                       rec_success=2).save()
-        Recommendation(customer_id=5,
-                       product_id=6,
-                       recommend_product_id=8,
-                       recommend_type="upsell",
-                       rec_success=1).save()
+#        #Recommendation(customer_id=2,
+#                       product_id=3,
+#                       recommend_product_id=4,
+#                       recommend_type="upsell",
+#                       rec_success=0).save()
+#        #Recommendation(customer_id=5,
+#                       product_id=6,
+#                       recommend_product_id=7,
+#                       recommend_type="downsell",
+#                       rec_success=2).save()
+#        #Recommendation(customer_id=5,
+#                       product_id=6,
+#                       recommend_product_id=8,
+#                       recommend_type="upsell",
+#                       rec_success=1).save()
 
     @classmethod
     def all(cls):
