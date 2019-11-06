@@ -12,7 +12,7 @@ applications:
   buildpacks: 
   - python_buildpack
   timeout: 180
-  #command: gunicorn --bind=0.0.0.0:$PORT service:app
+  command: null
   services:
   - Cloudant
   env:
