@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/nyudevops-recommendation/recommendations.svg?branch=master)](https://travis-ci.org/nyudevops-recommendation/recommendations)
 [![codecov](https://codecov.io/gh/nyudevops-recommendation/recommendations/branch/master/graph/badge.svg)](https://codecov.io/gh/nyudevops-recommendation/recommendations)
 
+
 ## Description
 
 The recommendations resource is a representation a product recommendation based on another product. In essence it is just a relationship between two products that "go together" (e.g., radio and batteries, printers and ink, shirts and pants, etc.). It could also recommend based on what other customers have purchased like "customers who bought item A usually buy item B". Recommendations should have a recommendation type like cross-sell, upsell, accessory, etc. This way a product page could request all of the up-sells for a product.   
@@ -17,6 +18,8 @@ The recommendations resource is a representation a product recommendation based 
 - **delete:** HTTP DELETE /recommendations/{id}
 - **success:** HTTP PUT /recommendations/{id}/success
 
+## To run the app on IBM Cloud
+visit: https://nyu-recommendation-service-f19.mybluemix.net/
 
 ## To run the Flask app 
 
