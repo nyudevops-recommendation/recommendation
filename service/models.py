@@ -30,7 +30,10 @@ recommend_type (string) - the recommend_type of the recommendation (upscale, dow
 recommend_product_id (int) - the identity of recommended product
 """
 import logging
+import os
 from flask_sqlalchemy import SQLAlchemy
+
+DATABASE_URI = os.getenv('DATABASE_URI', 'postgres://postgres:passw0rd@localhost:5432/postgres')
 
 # pylint: disable=no-member
 
