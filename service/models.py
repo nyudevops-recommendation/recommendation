@@ -33,8 +33,6 @@ import logging
 import os
 from flask_sqlalchemy import SQLAlchemy
 
-DATABASE_URI = os.getenv('DATABASE_URI', 'postgres://postgres:passw0rd@localhost:5432/postgres')
-
 # pylint: disable=no-member
 
 # Create the SQLAlchemy object to be initialized later in init_db()

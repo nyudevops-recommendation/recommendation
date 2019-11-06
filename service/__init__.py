@@ -26,8 +26,8 @@ from flask import Flask
 # pylint: disable=no-member
 
 # Get configuration from environment
-DATABASE_URI = os.getenv('DATABASE_URI', 'postgres://postgres:postgres@localhost:5432/postgres')
-SECRET_KEY = os.getenv('SECRET_KEY', 's3cr3t-key-shhhh')
+DATABASE_URI = os.getenv('DATABASE_URI', 'postgres://soqerjpq:YZCacYhoNGHPtbX0zixiq7Lu81MrRJ1U@salt.db.elephantsql.com:5432/soqerjpq')
+SECRET_KEY = os.getenv('SECRET_KEY', ' f869ba13-9684-40ce-a41e-eb5e2c72a289')
 
 # Create Flask application
 app = Flask(__name__)
