@@ -5,9 +5,6 @@ python:
 # command to install dependencies
 install: "pip install -r requirements.txt"
 
-env:
-  global:
-  - DATABASE_URI='https://api.elephantsql.com/console/de42c561-a16a-400a-a8b7-32ca17d3a1a4/details'
 
 script:
   - nosetests
