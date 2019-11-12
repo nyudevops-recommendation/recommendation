@@ -26,6 +26,7 @@ from service.models import Recommendation
 from service import app
 from utils import errorHandlers
 
+
 # pylint: disable=no-member
 
 ######################################################################
@@ -34,10 +35,7 @@ from utils import errorHandlers
 @app.route('/')
 def index():
     """ Root URL response """
-    return jsonify(name='Recommendation Demo REST API Service',
-                   version='1.0',
-                   paths=url_for('list_recommendations', _external=True)
-                  ), status.HTTP_200_OK
+    return app.send_static_file('index.html')
 
 
 ######################################################################
