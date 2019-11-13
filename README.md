@@ -19,7 +19,7 @@ The recommendations resource is a representation a product recommendation based 
 - **success:** HTTP PUT /recommendations/{id}/success
 
 ## Application URL: (deployed on IBM Cloud) 
-visit: https://nyu-recommendation-service-f19.mybluemix.net/  or call ``` honcho start ``` and visit  http://localhost:5000/
+visit: https://nyu-recommendation-service-f19.mybluemix.net/ 
 
 ## To run the Flask app 
 
