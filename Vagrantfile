@@ -54,7 +54,11 @@ Vagrant.configure(2) do |config|
     apt-get update
     apt-get install -y git zip tree python3 python3-pip python3-venv
     apt-get -y autoremove
-    pip install --upgrade pip
+    echo "\n*****************************************"
+    echo " Installing Chrome Headless and Selenium"
+    echo "*****************************************\n"
+    apt-get install -y chromium-chromedriver python3-selenium
+    chromedriver --version
     # Install app dependencies
     cd /vagrant
     pip3 install -r requirements.txt
