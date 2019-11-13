@@ -27,8 +27,7 @@ visit: https://nyu-recommendation-service-f19.mybluemix.net/  or call ``` honcho
 vagrant up
 vagrant ssh
 cd /vagrant
-nosetests
-FLASK_APP=service:app flask run --host=0.0.0.0 --port=5000
+honcho start
 ```
 then on your own machine, visit: http://localhost:5000/
 
