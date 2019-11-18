@@ -257,9 +257,9 @@ $(function () {
             $("#search_results").append('</table>');
 
             // copy the first result to the form
-            if (firstRecommendations != "") {
-                update_form_data(firstRecommendation)
-            }
+            //if (firstRecommendations != "") {
+                update_form_data(firstRecommendation);
+            //}
 
             flash_message("Success")
         });
