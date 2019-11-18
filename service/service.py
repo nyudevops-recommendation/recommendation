@@ -154,6 +154,15 @@ def rec_success(rec_id):
     recommendation.id = rec_id
     recommendation.save()
     return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)
+	
+######################################################################
+# DELETE ALL RECOMMENDATION DATA 
+######################################################################
+@app.route('/recommendations/reset', methods=['DELETE'])
+def recommendations_reset():
+    """ Removes all recommendations from the database """
+    Recommendation.remove_all()
+    return make_response('', status.HTTP_204_NO_CONTENT)
 
 
 ######################################################################

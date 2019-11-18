@@ -106,6 +106,17 @@ class TestRecommendations(unittest.TestCase):
         # delete the recommendation and make sure it isn't in the database
         recommendation.delete()
         self.assertEqual(len(Recommendation.all()), 0)
+		
+    def test_reset(self):
+        """ Reset """
+        recommendation = Recommendation(customer_id=2,
+                                        product_id=3, recommend_product_id=4,
+                                        recommend_type="upsell")
+        recommendation.save()
+        self.assertEqual(len(Recommendation.all()), 1)
+        # delete the recommendation and make sure it isn't in the database
+        recommendation.remove_all()
+        self.assertEqual(len(Recommendation.all()), 0)
 
     def test_serialize_a_recommendation(self):
         """ Test serialization of a Recommendation """

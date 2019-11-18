@@ -166,6 +166,18 @@ class TestRecommendationServer(unittest.TestCase):
         resp = self.app.get('/recommendations/{}'.format(test_recommendation.id),
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+		
+    def test_reset(self):
+        """ RESET """
+        test_recommendation = self._create_recommendations(1)[0]
+        resp = self.app.delete('/recommendations/reset',
+                               content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+        # make sure they are deleted
+        resp = self.app.get('/recommendations/{}'.format(test_recommendation.id),
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
 
     def test_update_recommendation(self):

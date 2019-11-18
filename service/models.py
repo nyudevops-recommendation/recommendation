@@ -186,3 +186,8 @@ class Recommendation(db.Model):
         if recommend_type:
             result = result.filter(cls.recommend_type == recommend_type)
         return result.all()
+		
+    @classmethod
+    def remove_all(cls):
+        """ Removes all documents from the database (use for testing)  """
+        cls.query.delete();
