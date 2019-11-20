@@ -39,11 +39,11 @@ Scenario: Create a Recommendation
 
 Scenario: Update a Recommendation
     When I visit the "Home Page"
-	And I set the "Product_ID" to "666"
+    And I set the "Product_ID" to "666"
     And I press the "Search" button
     Then I should see "666" in the "Product_ID" field
     And I should see "3" in the "Customer_ID" field
-	And I should see "1" in the "Recommend_Product_ID" field
+    And I should see "1" in the "Recommend_Product_ID" field
     When I change "Product_ID" to "9"
     And I press the "Update" button
     Then I should see the message "Success"
@@ -67,23 +67,23 @@ Scenario: List all Recommendation
 
 Scenario: Increment Success
     When I visit the "Home Page"
-	And I set the "Product_ID" to "666"
+    And I set the "Product_ID" to "666"
     And I press the "Search" button
     Then I should see "666" in the "Product_ID" field
     And I should see "3" in the "Customer_ID" field
-	And I should see "1" in the "Recommend_Product_ID" field
+    And I should see "1" in the "Recommend_Product_ID" field
     When I press the "Success" button
-	Then I should see the message "Success"
+    Then I should see the message "Success"
     When I press the "Clear" button
     And I press the "Search" button
 
 Scenario: Query
     When I visit the "Home Page"
-	And I press the "Clear" button
+    And I press the "Clear" button
     And I set the "Product_ID" to "1"
     And I press the "Search" button
     Then I should see "upsell" in the results
-	And I should see "crosssell" in the results
+    And I should see "crosssell" in the results
     And I should not see "accessory" in the results
 
 Scenario: Delete
@@ -104,3 +104,18 @@ Scenario: Delete
     And I press the "Delete" button
     And I press the "Retrieve" button
     Then I should not see "4" in the results
+
+Scenario: Read a Recommendation
+    When I visit the "Home Page"
+    And I set the "Product_ID" to "666"
+    And I press the "Search" button
+    Then I should see "666" in the "Product_ID" field
+    And I should see "3" in the "Customer_ID" field
+    And I should see "1" in the "Recommend_Product_ID" field
+    When I copy the "Recommendation_ID" field
+    And I press the "Clear" button
+    And I paste the "Recommendation_ID" field
+    And I press the "Retrieve" button
+    Then I should see "666" in the "Product_ID" field
+    And I should see "3" in the "Customer_ID" field
+    And I should see "1" in the "Recommend_Product_ID" field
