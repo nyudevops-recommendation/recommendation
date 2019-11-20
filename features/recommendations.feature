@@ -8,7 +8,7 @@ Background:
         | product_id | customer_id | recommend_type | recommend_product_id | rec_success |
         | 1          | 2           | upsell         | 3                    | 0           |
         | 1          | 2           | crosssell       | 4                    | 2           |
-        | 5          | 3           | accessory      | 1                    | 1           |
+        | 666          | 3           | accessory      | 1                    | 6           |
 
 
 Scenario: The server is running
@@ -39,9 +39,9 @@ Scenario: Create a Recommendation
 
 Scenario: Update a Recommendation
     When I visit the "Home Page"
-	And I set the "Product_ID" to "5"
+	And I set the "Product_ID" to "666"
     And I press the "Search" button
-    Then I should see "5" in the "Product_ID" field
+    Then I should see "666" in the "Product_ID" field
     And I should see "3" in the "Customer_ID" field
 	And I should see "1" in the "Recommend_Product_ID" field
     When I change "Product_ID" to "9"
@@ -55,13 +55,25 @@ Scenario: Update a Recommendation
     When I press the "Clear" button
     And I press the "Search" button
     Then I should see "9" in the results
-    Then I should not see "5" in the results
+    Then I should not see "666" in the results
 
 Scenario: List all Recommendation
     When I visit the "Home Page"
     And I press the "Search" button
     Then I should see "1" in the results
     And I should see "1" in the results
-    And I should see "5" in the results
+    And I should see "666" in the results
     And I should not see "77" in the results
 
+Scenario: Increment Success
+    When I visit the "Home Page"
+	And I set the "Product_ID" to "666"
+    And I press the "Search" button
+    Then I should see "666" in the "Product_ID" field
+    And I should see "3" in the "Customer_ID" field
+	And I should see "1" in the "Recommend_Product_ID" field
+    When I press the "Success" button
+	Then I should see the message "Success"
+    When I press the "Clear" button
+    And I press the "Search" button
+    Then I should see "7" in the results
