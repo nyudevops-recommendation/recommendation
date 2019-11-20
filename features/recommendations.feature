@@ -7,8 +7,8 @@ Background:
     Given the following recommendations
         | product_id | customer_id | recommend_type | recommend_product_id | rec_success |
         | 1          | 2           | upsell         | 3                    | 0           |
-        | 1          | 2           | crosssell       | 4                    | 2           |
-        | 666          | 3           | accessory      | 1                    | 6           |
+        | 1          | 2           | crosssell      | 4                    | 2           |
+        | 666        | 3           | accessory      | 1                    | 6           |
 
 
 Scenario: The server is running
@@ -86,3 +86,21 @@ Scenario: Query
 	And I should see "crosssell" in the results
     And I should not see "accessory" in the results
 
+Scenario: Delete
+    When I visit the "Home Page"
+    And I set the "Product_ID" to "4"
+    And I set the "Customer_ID" to "4"
+    And I set the "Recommend_Product_ID" to "6"
+    And I select "Upsell" in the "Recommend_Type" dropdown
+    And I press the "Create" button
+    Then I should see the message "Success"
+    When I copy the "Recommendation_ID" field
+    And I press the "Clear" button
+    Then the "Recommendation_Id" field should be empty
+    And the "Product_ID" field should be empty
+    And the "Customer_ID" field should be empty
+    And the "Recommend_Product_ID" field should be empty
+    When I paste the "Recommendation_ID" field
+    And I press the "Delete" button
+    And I press the "Retrieve" button
+    Then I should not see "4" in the results
