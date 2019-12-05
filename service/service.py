@@ -93,30 +93,30 @@ recommendation_args = reqparse.RequestParser()
 recommendation_args.add_argument('product_id', type=int, required=False, help='List Recommendations by product_id')
 recommendation_args.add_argument('customer_id', type=int, required=False, help='List Recommendations by customer_id')
 recommendation_args.add_argument('recommend_type', type=str, required=False, help='List Recommendations by recommend type')
-recommendation_args.add_argument('recommend_product_id', type=int, required=False, help='List Recommendations by recommend product_id')
-
-
-
-
 
 ######################################################################
 # LIST AND QUERY RECOMMENDATIONS
+#  PATH: /recommendations
 ######################################################################
-@app.route('/recommendations', methods=['GET'])
-def list_recommendations():
-    """ List all Recommendations given some attributes """
-    app.logger.info('Request for recommendation with product_id, customer_id, recommend_type')
-    product_id = request.args.get('product-id')
-    customer_id = request.args.get('customer-id')
-    recommend_type = request.args.get('recommend-type')
-    recommendations = Recommendation.find_by_attributes(product_id, customer_id, recommend_type)
-    if not recommendations:
-        raise NotFound("Recommendation with product_id {}, "
-                       "customer_id {}, recommend_type {} was not found."
-                       .format(product_id, customer_id, recommend_type))
-    results = [recommendation.serialize() for recommendation in recommendations]
-    return make_response(jsonify(results), status.HTTP_200_OK)
-
+@api.route('/recommendations', strict_slashes=False)
+class RecommendationCollection(Resource):
+    """ Handles all interactions with collections of Recommendations """
+    @api.doc('list_recommendations')
+    @api.expect(recommendation_args, validate=True)
+    @api.marshal_list_with(recommendation_model)
+    def get(self):
+        """ List all or query the Recommendations"""
+        app.logger.info('Request to list Recommendations...')
+        product_id = request.args.get('product-id')
+        customer_id = request.args.get('customer-id')
+        recommend_type = request.args.get('recommend-type')
+        recommendations = Recommendation.find_by_attributes(product_id, customer_id, recommend_type)
+        if not recommendations:
+            raise NotFound("Recommendation with product_id {}, "
+                           "customer_id {}, recommend_type {} was not found."
+                           .format(product_id, customer_id, recommend_type))
+        results = [recommendation.serialize() for recommendation in recommendations]
+        return results, status.HTTP_200_OK
 
 # #####################################################################
 # RETRIEVE A RECOMMENDATION
