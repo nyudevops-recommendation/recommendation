@@ -16,6 +16,7 @@ import sys
 import logging
 from flask import jsonify, request, url_for, make_response, abort
 from flask_api import status  # HTTP Status Codes
+from flask_restplus import Api, Resource, fields, reqparse, inputs
 from werkzeug.exceptions import NotFound
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
@@ -25,9 +26,16 @@ from service.models import Recommendation
 # Import Flask application
 from service import app
 from utils import errorHandlers
-
-
 # pylint: disable=no-member
+
+# Document the type of autorization required
+authorizations = {
+    'apikey': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'X-Api-Key'
+    }
+}
 
 ######################################################################
 # GET INDEX
@@ -36,6 +44,59 @@ from utils import errorHandlers
 def index():
     """ Root URL response """
     return app.send_static_file('index.html')
+
+######################################################################
+# Configure Swagger before initilaizing it
+######################################################################
+api = Api(app,
+          version='1.0.0',
+          title='Recommendation REST API Service',
+          description='This is Recommendation Microservice server.',
+          default='recommendations',
+          default_label='Recommendation operations',
+          doc='/apidocs/',
+          authorizations=authorizations
+          # prefix='/api'
+         )
+
+# Define the model so that the docs reflect what can be sent
+recommendation_model = api.model('Recommendation', {
+    'id': fields.Integer(readOnly=True,
+                         description='The unique id assigned internally by service'),
+    'product_id': fields.Integer(required=True,
+                          description='The id of the product'),
+    'customer_id': fields.Integer(required=True,
+                                 description='The id of the customer'),
+    'recommend_type': fields.String(required=True,
+                                  description='The recommendation type, e.g. up-sell, down-sell, etc.'),
+    'recommend_product_id': fields.Integer(required=True,
+                                  description='The id of the recommended product'),
+    'rec_success': fields.Integer(required=True,
+                                    description='Recommendation success count')
+})
+
+create_model = api.model('Recommendation', {
+    'product_id': fields.Integer(required=True,
+                                 description='The id of the product'),
+    'customer_id': fields.Integer(required=True,
+                                  description='The id of the customer'),
+    'recommend_type': fields.String(required=True,
+                                    description='The recommendation type, e.g. up-sell, down-sell, etc.'),
+    'recommend_product_id': fields.Integer(required=True,
+                                           description='The id of the recommended product'),
+    'rec_success': fields.Integer(required=True,
+                                  description='Recommendation success count')
+})
+
+# query string arguments
+recommendation_args = reqparse.RequestParser()
+recommendation_args.add_argument('product_id', type=int, required=False, help='List Recommendations by product_id')
+recommendation_args.add_argument('customer_id', type=int, required=False, help='List Recommendations by customer_id')
+recommendation_args.add_argument('recommend_type', type=str, required=False, help='List Recommendations by recommend type')
+recommendation_args.add_argument('recommend_product_id', type=int, required=False, help='List Recommendations by recommend product_id')
+
+
+
 
 
 ######################################################################
