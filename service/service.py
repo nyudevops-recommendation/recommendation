@@ -118,6 +118,30 @@ class RecommendationCollection(Resource):
         results = [recommendation.serialize() for recommendation in recommendations]
         return results, status.HTTP_200_OK
 
+######################################################################
+#  PATH: /recommendations/{id}
+######################################################################
+@api.route('/recommendations/<int:rec_id>')
+@api.param('rec_id', 'The Recommendation identifier')
+class RecommendationResource(Resource):
+    #------------------------------------------------------------------
+    # DELETE A RECOMMENDATION
+    #------------------------------------------------------------------
+    @api.doc('delete_recommendations', security='apikey')
+    @api.response(204, 'Recommendation deleted')
+    def delete(self, rec_id):
+        """
+        Delete a recommendation
+    
+        This endpoint will delete a recommendation based the id specified in the path
+        """
+        app.logger.info('Request to delete recommendation with id: %s', rec_id)
+        recommendation = Recommendation.find(rec_id)
+        if recommendation:
+            recommendation.delete()
+        return '', status.HTTP_204_NO_CONTENT
+
+
 # #####################################################################
 # RETRIEVE A RECOMMENDATION
 # #####################################################################
@@ -155,25 +179,6 @@ def create_recommendations():
                          {
                              'Location': location_url
                          })
-
-
-######################################################################
-# DELETE A RECOMMENDATION
-# HTTP DELETE /recommendations/{rec_id} - deletes a recommendation record in the database
-######################################################################
-
-@app.route('/recommendations/<int:rec_id>', methods=['DELETE'])
-def delete_recommendations(rec_id):
-    """
-    Delete a recommendation
-
-    This endpoint will delete a recommendation based the id specified in the path
-    """
-    app.logger.info('Request to delete recommendation with id: %s', rec_id)
-    recommendation = Recommendation.find(rec_id)
-    if recommendation:
-        recommendation.delete()
-    return make_response('', status.HTTP_204_NO_CONTENT)
 
 
 ######################################################################
