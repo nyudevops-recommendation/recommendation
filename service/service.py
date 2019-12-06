@@ -13,7 +13,9 @@
 
 
 import sys
+import uuid
 import logging
+from functools import wraps
 from flask import jsonify, request, url_for, make_response, abort
 from flask_api import status  # HTTP Status Codes
 from flask_restplus import Api, Resource, fields, reqparse, inputs
@@ -36,6 +38,29 @@ authorizations = {
         'name': 'X-Api-Key'
     }
 }
+
+######################################################################
+# Authorization Decorator
+######################################################################
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if 'X-Api-Key' in request.headers:
+            token = request.headers['X-Api-Key']
+
+        if app.config.get('API_KEY') and app.config['API_KEY'] == token:
+            return f(*args, **kwargs)
+        else:
+            return {'message': 'Invalid or missing token'}, 401
+    return decorated
+
+######################################################################
+# Function to generate a random API key (good for testing)
+######################################################################
+def generate_apikey():
+    """ Helper function used when testing API keys """
+    return uuid.uuid4().hex
 
 ######################################################################
 # GET INDEX
@@ -140,6 +165,31 @@ class RecommendationResource(Resource):
         if recommendation:
             recommendation.delete()
         return '', status.HTTP_204_NO_CONTENT
+    
+    #------------------------------------------------------------------
+    # UPDATE AN EXISTING RECOMMENDATION
+    #------------------------------------------------------------------
+    @api.doc('update_recommendation', security='apikey')
+    @api.response(404, 'Recommendation not found')
+    @api.response(400, 'The posted Recommendation data was not valid')
+    @api.expect(recommendation_model)
+    @api.marshal_with(recommendation_model)
+    @token_required
+    def put(self, rec_id):
+        """
+        Update a Recommendation
+        This endpoint will update a Recommendation based the body that is posted
+        """
+        app.logger.info('Request to update recommendation with id: %s', rec_id)
+        check_content_type('application/json')
+        recommendation = Recommendation.find(rec_id)
+        if not recommendation:
+            raise NotFound("Recommendation with id '{}' was not found.".format(rec_id))
+        recommendation.deserialize(request.get_json())
+        recommendation.id = rec_id
+        recommendation.save()
+        return recommendation.serialize(), status.HTTP_200_OK
+    
 
 
 # #####################################################################
@@ -181,26 +231,6 @@ def create_recommendations():
                          })
 
 
-######################################################################
-# UPDATE AN EXISTING RECOMMENDATION
-# HTTP PUT /recommendations/{rec_id} - updates a recommendation record in the database
-######################################################################
-@app.route('/recommendations/<int:rec_id>', methods=['PUT'])
-def update_recommendations(rec_id):
-    """
-    Update a Recommendations
-    This endpoint will update a Recommendation based the body that is posted
-    """
-    app.logger.info('Request to update recommendation with id: %s', rec_id)
-    check_content_type('application/json')
-    recommendation = Recommendation.find(rec_id)
-    if not recommendation:
-        raise NotFound("Recommendation with id '{}' was not found.".format(rec_id))
-    recommendation.deserialize(request.get_json())
-    recommendation.id = rec_id
-    recommendation.save()
-    return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)
-	
 ######################################################################
 # INCREMENT SUCCESS COUNTER
 # HTTP PUT /recommendations/{rec_id} - increments the success counter of a given record

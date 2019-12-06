@@ -27,7 +27,7 @@ import logging
 from unittest.mock import MagicMock, patch
 from flask_api import status  # HTTP Status Codes
 from service.models import Recommendation, DataValidationError, db
-from service.service import app, init_db, initialize_logging
+from service.service import app, init_db, initialize_logging, generate_apikey
 from .recommendation_factory import RecommendationFactory
 
 
@@ -44,6 +44,8 @@ class TestRecommendationServer(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """ Run once before all tests """
+        api_key = generate_apikey()
+        app.config['API_KEY'] = api_key
         app.debug = False
         initialize_logging(logging.INFO)
         # Set up the test database
@@ -55,10 +57,16 @@ class TestRecommendationServer(unittest.TestCase):
 
     def setUp(self):
         """ Runs before each test """
+        self.headers = {
+            'X-Api-Key': app.config['API_KEY']
+        }
         init_db()
         db.drop_all()  # clean up the last tests
         db.create_all()  # create new tables
         self.app = app.test_client()
+        self.headers = {
+            'X-Api-Key': app.config['API_KEY']
+        }
 
     def tearDown(self):
         db.session.remove()
@@ -77,7 +85,8 @@ class TestRecommendationServer(unittest.TestCase):
             test_recommendation = RecommendationFactory()
             resp = self.app.post('/recommendations',
                                  json=test_recommendation.serialize(),
-                                 content_type='application/json')
+                                 content_type='application/json', 
+                                 headers=self.headers)
             self.assertEqual(resp.status_code, status.HTTP_201_CREATED,
                              'Could not create test recommendation')
             new_recommendation = resp.get_json()
@@ -98,7 +107,8 @@ class TestRecommendationServer(unittest.TestCase):
         # get the id of a recommendation
         test_rec = self._create_recommendations(1)[0]
         resp = self.app.get('/recommendations/{}'.format(test_rec.id),
-                            content_type='application/json')
+                            content_type='application/json', 
+                            headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(data['id'], test_rec.id)
@@ -108,7 +118,8 @@ class TestRecommendationServer(unittest.TestCase):
         test_recommendation = RecommendationFactory()
         resp = self.app.post('/recommendations',
                              json=test_recommendation.serialize(),
-                             content_type='application/json')
+                             content_type='application/json',
+                             headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # Make sure location header is set
         location = resp.headers.get('Location', None)
@@ -129,7 +140,8 @@ class TestRecommendationServer(unittest.TestCase):
 
         # Check that the location header was correct
         resp = self.app.get(location,
-                            content_type='application/json')
+                            content_type='application/json',
+                            headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_recommendation = resp.get_json()
         self.assertEqual(new_recommendation['product_id'],
@@ -147,7 +159,8 @@ class TestRecommendationServer(unittest.TestCase):
         test_recommendation = RecommendationFactory()
         resp = self.app.post('/recommendations',
                              json=test_recommendation.serialize(),
-                             content_type="a_bad_type")
+                             content_type="a_bad_type",
+                             headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     def test_get_recommendation_not_found(self):
@@ -159,43 +172,44 @@ class TestRecommendationServer(unittest.TestCase):
         """ Delete a Recommendation """
         test_recommendation = self._create_recommendations(1)[0]
         resp = self.app.delete('/recommendations/{}'.format(test_recommendation.id),
-                               content_type='application/json')
+                               content_type='application/json',
+                               headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(resp.data), 0)
         # make sure they are deleted
         resp = self.app.get('/recommendations/{}'.format(test_recommendation.id),
-                            content_type='application/json')
+                            content_type='application/json',
+                            headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 		
     def test_reset(self):
         """ RESET """
         test_recommendation = self._create_recommendations(1)[0]
         resp = self.app.delete('/recommendations/reset',
-                               content_type='application/json')
+                               content_type='application/json',
+                               headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(resp.data), 0)
         # make sure they are deleted
         resp = self.app.get('/recommendations/{}'.format(test_recommendation.id),
-                            content_type='application/json')
+                            content_type='application/json',
+                            headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
 
     def test_update_recommendation(self):
         """ Update an existing Recommendation """
         # create a recommendation to update
-        test_recommendation = RecommendationFactory()
-        resp = self.app.post('/recommendations',
-                             json=test_recommendation.serialize(),
-                             content_type='application/json')
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        test_recommendation = self._create_recommendations(1)[0]
+        test_recommendation.recommend_type = 'unknown'
 
         # update the recommendation
-        test_recommendation = resp.get_json()
-        test_recommendation['recommend_type'] = 'unknown'
-        resp = self.app.put('/recommendations/{}'.format(test_recommendation['id']),
-                            json=test_recommendation,
-                            content_type='application/json')
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        resp = self.app.put('/recommendations/{}'.format(test_recommendation.id),
+                            json=test_recommendation.serialize(),
+                            content_type='application/json',
+                            headers=self.headers)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK) 
+        
         updated_recommendation = resp.get_json()
         self.assertEqual(updated_recommendation['recommend_type'], 'unknown')
 
@@ -205,13 +219,15 @@ class TestRecommendationServer(unittest.TestCase):
         test_recommendation = RecommendationFactory()
         resp = self.app.post('/recommendations',
                              json=test_recommendation.serialize(),
-                             content_type='application/json')
+                             content_type='application/json',
+                             headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
         # increment the recommendation
         new_recommendation = resp.get_json()
         resp = self.app.put('/recommendations/{}/success'.format(new_recommendation['id']),
-                            content_type='application/json')
+                            content_type='application/json',
+                            headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_recommendation = resp.get_json()
         self.assertEqual(updated_recommendation['rec_success'], 1)
@@ -221,7 +237,8 @@ class TestRecommendationServer(unittest.TestCase):
         test_recommendation = RecommendationFactory()
         resp = self.app.put('/recommendations/0/success',
                             json=test_recommendation.serialize(),
-                            content_type='application/json')
+                            content_type='application/json',
+                            headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_update_recommendation_not_found(self):
@@ -229,7 +246,8 @@ class TestRecommendationServer(unittest.TestCase):
         test_recommendation = RecommendationFactory()
         resp = self.app.put('/recommendations/0',
                             json=test_recommendation.serialize(),
-                            content_type='application/json')
+                            content_type='application/json',
+                            headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_query_recommendation(self):
