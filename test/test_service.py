@@ -32,8 +32,8 @@ from .recommendation_factory import RecommendationFactory
 
 
 # DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
-#DATABASE_URI = os.getenv('DATABASE_URI', 'postgres://postgres:passw0rd@localhost:5432/postgres')
-DATABASE_URI = os.getenv('DATABASE_URI', 'postgres://soqerjpq:YZCacYhoNGHPtbX0zixiq7Lu81MrRJ1U@salt.db.elephantsql.com:5432/soqerjpq')
+DATABASE_URI = os.getenv('DATABASE_URI', 'postgres://postgres:passw0rd@localhost:5432/postgres')
+
 
 ######################################################################
 #  T E S T   C A S E S
@@ -48,7 +48,6 @@ class TestRecommendationServer(unittest.TestCase):
         initialize_logging(logging.INFO)
         # Set up the test database
         app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
-        init_db()
 
     @classmethod
     def tearDownClass(cls):
@@ -56,6 +55,7 @@ class TestRecommendationServer(unittest.TestCase):
 
     def setUp(self):
         """ Runs before each test """
+        init_db()
         db.drop_all()  # clean up the last tests
         db.create_all()  # create new tables
         self.app = app.test_client()
