@@ -25,9 +25,9 @@ from werkzeug.exceptions import NotFound
 from service.models import Recommendation, DataValidationError, db
 from service import app
 
-DATABASE_URI = os.getenv('DATABASE_URI', 'postgres://postgres:passw0rd@localhost:5432/postgres')
+#DATABASE_URI = os.getenv('DATABASE_URI', 'postgres://postgres:passw0rd@localhost:5432/postgres')
 
-#DATABASE_URI = os.getenv('DATABASE_URI', 'postgres://soqerjpq:YZCacYhoNGHPtbX0zixiq7Lu81MrRJ1U@salt.db.elephantsql.com:5432/soqerjpq')
+DATABASE_URI = os.getenv('DATABASE_URI', 'postgres://soqerjpq:YZCacYhoNGHPtbX0zixiq7Lu81MrRJ1U@salt.db.elephantsql.com:5432/soqerjpq')
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
@@ -40,13 +40,13 @@ class TestRecommendations(unittest.TestCase):
         app.debug = False
         # Set up the test database
         app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
+        Recommendation.init_db(app)
 
     @classmethod
     def tearDownClass(cls):
         pass
 
     def setUp(self):
-        Recommendation.init_db(app)
         db.drop_all()  # clean up the last tests
         db.create_all()  # make our sqlalchemy tables
 
