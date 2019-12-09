@@ -1,7 +1,7 @@
 ---
 # This manifest deploys a Python Flask application
 applications:
-- name: nyu-recommendations-pipeline
+- name: nyu-recommendation-service-f19
   path: .
   instances: 1
   memory: 64M
