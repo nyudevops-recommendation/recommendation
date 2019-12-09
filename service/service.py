@@ -182,43 +182,7 @@ class RecommendationResource(Resource):
         return recommendation.serialize(), status.HTTP_200_OK
 
 		
-# #####################################################################
-# RETRIEVE A RECOMMENDATION
-# #####################################################################
-#@app.route('/recommendations/<int:rec_id>', methods=['GET'])
-#def get_recommendations(rec_id):
-#    """
-#    Retrieve a single Recommendation
-#    This endpoint will return a Recommendation based on it's id
-#    """
-#    app.logger.info('Request for recommendation with id: %s', rec_id)
-#    recommendation = Recommendation.find(rec_id)
-#    if not recommendation:
-#        raise NotFound("Recommendation with id '{}' was not found.".format(rec_id))
-#    return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)
 
-		
-######################################################################
-# ADD A NEW RECOMMENDATION
-######################################################################
-#@app.route('/recommendations', methods=['POST'])
-#def create_recommendations():
-#    """
-#    Creates a Recommendation
-#    This endpoint will create a Recommendation based the data in the body that is posted
-#    """
-#    app.logger.info('Request to create a Recommendation')
-#    check_content_type('application/json')
-#    recommendation = Recommendation()
-#    recommendation.deserialize(request.get_json())
-#    recommendation.rec_success = 0
-#    recommendation.save()
-#    message = recommendation.serialize()
-#    location_url = url_for('get_recommendations', rec_id=recommendation.id, _external=True)
-#    return make_response(jsonify(message), status.HTTP_201_CREATED,
-#                         {
-#                             'Location': location_url
-#                         })
 
 
 ######################################################################
