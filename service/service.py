@@ -189,12 +189,6 @@ class RecommendationResource(Resource):
             api.abort(status.HTTP_404_NOT_FOUND, "Recommendation with id '{}' was not found.".format(rec_id))
         return recommendation.serialize(), status.HTTP_200_OK
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-		
-=======
->>>>>>> master
     #------------------------------------------------------------------
     # UPDATE AN EXISTING RECOMMENDATION
     #------------------------------------------------------------------
@@ -217,7 +211,6 @@ class RecommendationResource(Resource):
         recommendation.id = rec_id
         recommendation.save()
         return recommendation.serialize(), status.HTTP_200_OK
-<<<<<<< HEAD
 
 # #####################################################################
 # RETRIEVE A RECOMMENDATION
@@ -257,11 +250,6 @@ def create_recommendations():
                              'Location': location_url
                          })
 
-=======
->>>>>>> Add Swagger for Update API
-
-
->>>>>>> master
 ######################################################################
 # INCREMENT SUCCESS COUNTER
 # HTTP PUT /recommendations/{rec_id} - increments the success counter of a given record
