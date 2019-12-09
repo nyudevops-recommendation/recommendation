@@ -15,7 +15,6 @@
 import sys
 import uuid
 import logging
-from functools import wraps
 from flask import jsonify, request, url_for, make_response, abort
 from flask_api import status  # HTTP Status Codes
 from flask_restplus import Api, Resource, fields, reqparse, inputs
@@ -38,19 +37,6 @@ authorizations = {
         'name': 'X-Api-Key'
     }
 }
-
-def token_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = None
-        if 'X-Api-Key' in request.headers:
-            token = request.headers['X-Api-Key']
-
-        if app.config.get('API_KEY') and app.config['API_KEY'] == token:
-            return f(*args, **kwargs)
-        else:
-            return {'message': 'Invalid or missing token'}, 401
-    return decorated
 
 ######################################################################
 # Function to generate a random API key (good for testing)
@@ -211,7 +197,6 @@ class RecommendationResource(Resource):
     @api.response(400, 'The posted Recommendation data was not valid')
     @api.expect(recommendation_model)
     @api.marshal_with(recommendation_model)
-    @token_required
     def put(self, rec_id):
         """
         Update a Recommendation
@@ -221,10 +206,8 @@ class RecommendationResource(Resource):
         # check_content_type('application/json')
         recommendation = Recommendation.find(rec_id)
         if not recommendation:
-            raise NotFound("Recommendation with id '{}' was not found.".format(rec_id))
-        app.logger.debug('Payload = %s', api.payload)
-        data = api.payload
-        recommendation.deserialize(data)
+            api.abort(status.HTTP_404_NOT_FOUND, "Recommendation with id '{}' was not found.".format(rec_id))
+        recommendation.deserialize(request.get_json())
         recommendation.id = rec_id
         recommendation.save()
         return recommendation.serialize(), status.HTTP_200_OK
