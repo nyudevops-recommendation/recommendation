@@ -15,6 +15,7 @@
 import sys
 import uuid
 import logging
+from functools import wraps
 from flask import jsonify, request, url_for, make_response, abort
 from flask_api import status  # HTTP Status Codes
 from flask_restplus import Api, Resource, fields, reqparse, inputs
@@ -22,7 +23,7 @@ from werkzeug.exceptions import NotFound
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
-from service.models import Recommendation 
+from service.models import Recommendation
 
 # Import Flask application
 from service import app
@@ -37,6 +38,19 @@ authorizations = {
         'name': 'X-Api-Key'
     }
 }
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if 'X-Api-Key' in request.headers:
+            token = request.headers['X-Api-Key']
+
+        if app.config.get('API_KEY') and app.config['API_KEY'] == token:
+            return f(*args, **kwargs)
+        else:
+            return {'message': 'Invalid or missing token'}, 401
+    return decorated
 
 ######################################################################
 # Function to generate a random API key (good for testing)
@@ -189,12 +203,6 @@ class RecommendationResource(Resource):
             api.abort(status.HTTP_404_NOT_FOUND, "Recommendation with id '{}' was not found.".format(rec_id))
         return recommendation.serialize(), status.HTTP_200_OK
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-		
-=======
->>>>>>> master
     #------------------------------------------------------------------
     # UPDATE AN EXISTING RECOMMENDATION
     #------------------------------------------------------------------
@@ -203,65 +211,25 @@ class RecommendationResource(Resource):
     @api.response(400, 'The posted Recommendation data was not valid')
     @api.expect(recommendation_model)
     @api.marshal_with(recommendation_model)
+    @token_required
     def put(self, rec_id):
         """
         Update a Recommendation
         This endpoint will update a Recommendation based the body that is posted
         """
         app.logger.info('Request to update recommendation with id: %s', rec_id)
-        check_content_type('application/json')
+        # check_content_type('application/json')
         recommendation = Recommendation.find(rec_id)
         if not recommendation:
-            api.abort(status.HTTP_404_NOT_FOUND, "Recommendation with id '{}' was not found.".format(rec_id))
-        recommendation.deserialize(request.get_json())
+            raise NotFound("Recommendation with id '{}' was not found.".format(rec_id))
+        app.logger.debug('Payload = %s', api.payload)
+        data = api.payload
+        recommendation.deserialize(data)
         recommendation.id = rec_id
         recommendation.save()
         return recommendation.serialize(), status.HTTP_200_OK
-<<<<<<< HEAD
-
-# #####################################################################
-# RETRIEVE A RECOMMENDATION
-# #####################################################################
-@app.route('/recommendations/<int:rec_id>', methods=['GET'])
-def get_recommendations(rec_id):
-    """
-    Retrieve a single Recommendation
-    This endpoint will return a Recommendation based on it's id
-    """
-    app.logger.info('Request for recommendation with id: %s', rec_id)
-    recommendation = Recommendation.find(rec_id)
-    if not recommendation:
-        raise NotFound("Recommendation with id '{}' was not found.".format(rec_id))
-    return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)
 
 
-######################################################################
-# ADD A NEW RECOMMENDATION
-######################################################################
-@app.route('/recommendations', methods=['POST'])
-def create_recommendations():
-    """
-    Creates a Recommendation
-    This endpoint will create a Recommendation based the data in the body that is posted
-    """
-    app.logger.info('Request to create a Recommendation')
-    check_content_type('application/json')
-    recommendation = Recommendation()
-    recommendation.deserialize(request.get_json())
-    recommendation.rec_success = 0
-    recommendation.save()
-    message = recommendation.serialize()
-    location_url = url_for('get_recommendations', rec_id=recommendation.id, _external=True)
-    return make_response(jsonify(message), status.HTTP_201_CREATED,
-                         {
-                             'Location': location_url
-                         })
-
-=======
->>>>>>> Add Swagger for Update API
-
-
->>>>>>> master
 ######################################################################
 # INCREMENT SUCCESS COUNTER
 # HTTP PUT /recommendations/{rec_id} - increments the success counter of a given record
