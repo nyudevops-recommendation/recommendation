@@ -76,6 +76,7 @@ Scenario: Increment Success
     Then I should see the message "Success"
     When I press the "Clear" button
     And I press the "Search" button
+    Then I should see "7" in the results 
 
 Scenario: Query
     When I visit the "Home Page"
