@@ -19,3 +19,22 @@ applications:
   env:
     FLASK_APP : service:app
     FLASK_DEBUG : false
+
+- name: nyu-recommendation-service-f19-prod
+  path: .
+  instances: 1
+  memory: 64M
+  #random-route: true
+  routes:
+  - route: nyu-recommendation-service-f19-prod.mybluemix.net
+  disk_quota: 1024M
+  buildpacks:
+  - python_buildpack
+  timeout: 180
+  #command: gunicorn --bind=0.0.0.0:$PORT service:app
+  command: null
+  services:
+  #- Cloudant
+  env:
+    FLASK_APP : service:app
+    FLASK_DEBUG : false
