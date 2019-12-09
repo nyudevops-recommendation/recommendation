@@ -3,7 +3,7 @@
 applications:
 - name: nyu-recommendation-service-f19
   path: .
-  instances: 2
+  instances: 1
   memory: 64M
   #random-route: true
   routes:
