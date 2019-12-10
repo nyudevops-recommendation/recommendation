@@ -184,7 +184,7 @@ class RecommendationResource(Resource):
     #------------------------------------------------------------------
     # UPDATE AN EXISTING RECOMMENDATION
     #------------------------------------------------------------------
-    @api.doc('update_recommendation')
+    @api.doc('update_recommendation', security='apikey')
     @api.response(404, 'Recommendation not found')
     @api.response(400, 'The posted Recommendation data was not valid')
     @api.expect(recommendation_model)
