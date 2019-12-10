@@ -205,25 +205,35 @@ class RecommendationResource(Resource):
         return recommendation.serialize(), status.HTTP_200_OK
 
 ######################################################################
-# INCREMENT SUCCESS COUNTER
-# HTTP PUT /recommendations/{rec_id} - increments the success counter of a given record
+#  PATH: /recommendations/{<int:rec_id>/success
 ######################################################################
-@app.route('/recommendations/<int:rec_id>/success', methods=['PUT'])
-def rec_success(rec_id):
-    """
-    Increment A Recommendation's Success field
-    """
-    app.logger.info('Increment success field for recommendation with id: %s', rec_id)
-    check_content_type('application/json')
-    recommendation = Recommendation.find(rec_id)
-    if not recommendation:
-        raise NotFound("Recommendation with id '{}' was not found.".format(rec_id))
-    count = recommendation.rec_success
-    recommendation.rec_success = count + 1
-    recommendation.id = rec_id
-    recommendation.save()
-    return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)
-	
+@api.route('/recommendations/<int:rec_id>/success')
+@api.param('promotion_id', 'The Promotion identifier')
+class ApplyResource(Resource):
+    #------------------------------------------------------------------
+    # INCREMENT SUCCESS COUNTER
+    #------------------------------------------------------------------
+    @api.doc('update_recommendation', security='apikey')
+    @api.response(404, 'Recommendation not found')
+    @api.response(400, 'The posted Recommendation data was not valid')
+    @api.expect(recommendation_model)
+    @api.marshal_with(recommendation_model)
+    def put(self, rec_id):
+        """
+        Increase a Recommendation
+        This endpoint will update a Recommendation based the body that is posted
+        """
+        app.logger.info('Request to update recommendation with id: %s', rec_id)
+        check_content_type('application/json')
+        recommendation = Recommendation.find(rec_id)
+        if not recommendation:
+            api.abort(status.HTTP_404_NOT_FOUND, "Recommendation with id '{}' was not found.".format(rec_id))
+        count = recommendation.rec_success
+        recommendation.rec_success = count + 1
+        recommendation.id = rec_id
+        recommendation.save()
+        return recommendation.serialize(), status.HTTP_200_OK
+        
 ######################################################################
 # DELETE ALL RECOMMENDATION DATA 
 ######################################################################
