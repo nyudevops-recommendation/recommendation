@@ -256,19 +256,6 @@ class TestRecommendationServer(unittest.TestCase):
                             headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_update_recommendation_not_authorized(self):
-        """ Update a Recommendation Not Authorized """
-        # create a recommendation to update
-        test_recommendation = self._create_recommendations(1)[0]
-        test_recommendation.recommend_type = 'unknown'
-
-        # update the recommendation
-        resp = self.app.put('/recommendations/{}'.format(test_recommendation.id),
-                            json=test_recommendation.serialize(),
-                            content_type='application/json') 
-
-        self.assertEqual(resp.status_code, HTTP_401_NOT_AUTHORIZED)
-
     def test_query_recommendation(self):
         """ Query by customer_id and product_id """
         test_rec = self._create_recommendations(5)[0]
