@@ -74,9 +74,6 @@ Scenario: Increment Success
     And I should see "1" in the "Recommend_Product_ID" field
     When I press the "Success" button
     Then I should see the message "Success"
-    When I press the "Clear" button
-    And I press the "Search" button
-    Then I should see "7" in the results 
 
 Scenario: Query
     When I visit the "Home Page"

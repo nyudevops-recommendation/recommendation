@@ -36,6 +36,8 @@ from flask_sqlalchemy import SQLAlchemy
 # pylint: disable=no-member
 
 # Create the SQLAlchemy object to be initialized later in init_db()
+from requests import HTTPError
+
 db = SQLAlchemy()
 
 class DataValidationError(Exception):
@@ -64,6 +66,11 @@ class Recommendation(db.Model):
         """
         Saves a Recommendation to the data store
         """
+        if self.product_id is None or self.customer_id is None \
+                or self.recommend_type is None or self.recommend_product_id is None\
+                or type(self.product_id) is not int or type(self.customer_id) is not int \
+                or type(self.recommend_type) is not str or type(self.recommend_product_id) is not int :
+            raise DataValidationError('invalid input.')
         Recommendation.logger.info('Saving %s', self.id)
         if not self.id:
             db.session.add(self)

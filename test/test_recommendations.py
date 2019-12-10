@@ -81,6 +81,28 @@ class TestRecommendations(unittest.TestCase):
         recommendations = Recommendation.all()
         self.assertEqual(len(recommendations), 1)
 
+    def test_add_a_recommendation_without_customer_id(self):
+        """ Create a recommendation without customer id """
+        recommendations = Recommendation.all()
+        self.assertEqual(recommendations, [])
+        recommendation = Recommendation(customer_id=None,
+                                        product_id=3, recommend_product_id=4,
+                                        recommend_type="upsell")
+        self.assertTrue(recommendation is not None)
+        self.assertEqual(recommendation.id, None)
+        self.assertRaises(DataValidationError, recommendation.save)
+
+    def test_add_a_recommendation_bad_type(self):
+        """ Create a recommendation with bad type """
+        recommendations = Recommendation.all()
+        self.assertEqual(recommendations, [])
+        recommendation = Recommendation(customer_id="a bad customer",
+                                        product_id=3, recommend_product_id=4,
+                                        recommend_type="upsell")
+        self.assertTrue(recommendation is not None)
+        self.assertEqual(recommendation.id, None)
+        self.assertRaises(DataValidationError, recommendation.save)
+
     def test_update_a_recommendation(self):
         """ Update a Recommendation """
         recommendation = Recommendation(customer_id=2,
