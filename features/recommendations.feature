@@ -55,7 +55,6 @@ Scenario: Update a Recommendation
     When I press the "Clear" button
     And I press the "Search" button
     Then I should see "9" in the results
-    Then I should not see "666" in the results
 
 Scenario: List all Recommendation
     When I visit the "Home Page"
