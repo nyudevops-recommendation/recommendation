@@ -13,6 +13,7 @@
 
 
 import sys
+import uuid
 import logging
 from flask import jsonify, request, url_for, make_response, abort
 from flask_api import status  # HTTP Status Codes
@@ -21,7 +22,7 @@ from werkzeug.exceptions import NotFound
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
-from service.models import Recommendation
+from service.models import Recommendation 
 
 # Import Flask application
 from service import app
@@ -36,6 +37,13 @@ authorizations = {
         'name': 'X-Api-Key'
     }
 }
+
+######################################################################
+# Function to generate a random API key (good for testing)
+######################################################################
+def generate_apikey():
+    """ Helper function used when testing API keys """
+    return uuid.uuid4().hex
 
 ######################################################################
 # GET INDEX
@@ -181,30 +189,67 @@ class RecommendationResource(Resource):
             api.abort(status.HTTP_404_NOT_FOUND, "Recommendation with id '{}' was not found.".format(rec_id))
         return recommendation.serialize(), status.HTTP_200_OK
 
-		
+    #------------------------------------------------------------------
+    # UPDATE AN EXISTING RECOMMENDATION
+    #------------------------------------------------------------------
+    @api.doc('update_recommendation', security='apikey')
+    @api.response(404, 'Recommendation not found')
+    @api.response(400, 'The posted Recommendation data was not valid')
+    @api.expect(recommendation_model)
+    @api.marshal_with(recommendation_model)
+    def put(self, rec_id):
+        """
+        Update a Recommendation
+        This endpoint will update a Recommendation based the body that is posted
+        """
+        app.logger.info('Request to update recommendation with id: %s', rec_id)
+        check_content_type('application/json')
+        recommendation = Recommendation.find(rec_id)
+        if not recommendation:
+            api.abort(status.HTTP_404_NOT_FOUND, "Recommendation with id '{}' was not found.".format(rec_id))
+        recommendation.deserialize(request.get_json())
+        recommendation.id = rec_id
+        recommendation.save()
+        return recommendation.serialize(), status.HTTP_200_OK
 
-
-
-######################################################################
-# UPDATE AN EXISTING RECOMMENDATION
-# HTTP PUT /recommendations/{rec_id} - updates a recommendation record in the database
-######################################################################
-@app.route('/recommendations/<int:rec_id>', methods=['PUT'])
-def update_recommendations(rec_id):
+# #####################################################################
+# RETRIEVE A RECOMMENDATION
+# #####################################################################
+@app.route('/recommendations/<int:rec_id>', methods=['GET'])
+def get_recommendations(rec_id):
     """
-    Update a Recommendations
-    This endpoint will update a Recommendation based the body that is posted
+    Retrieve a single Recommendation
+    This endpoint will return a Recommendation based on it's id
     """
-    app.logger.info('Request to update recommendation with id: %s', rec_id)
-    check_content_type('application/json')
+    app.logger.info('Request for recommendation with id: %s', rec_id)
     recommendation = Recommendation.find(rec_id)
     if not recommendation:
         raise NotFound("Recommendation with id '{}' was not found.".format(rec_id))
-    recommendation.deserialize(request.get_json())
-    recommendation.id = rec_id
-    recommendation.save()
     return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)
-	
+
+
+######################################################################
+# ADD A NEW RECOMMENDATION
+######################################################################
+@app.route('/recommendations', methods=['POST'])
+def create_recommendations():
+    """
+    Creates a Recommendation
+    This endpoint will create a Recommendation based the data in the body that is posted
+    """
+    app.logger.info('Request to create a Recommendation')
+    check_content_type('application/json')
+    recommendation = Recommendation()
+    recommendation.deserialize(request.get_json())
+    recommendation.rec_success = 0
+    recommendation.save()
+    message = recommendation.serialize()
+    location_url = url_for('get_recommendations', rec_id=recommendation.id, _external=True)
+    return make_response(jsonify(message), status.HTTP_201_CREATED,
+                         {
+                             'Location': location_url
+                         })
+
 ######################################################################
 # INCREMENT SUCCESS COUNTER
 # HTTP PUT /recommendations/{rec_id} - increments the success counter of a given record
