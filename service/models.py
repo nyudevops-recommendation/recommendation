@@ -36,11 +36,12 @@ from flask_sqlalchemy import SQLAlchemy
 # pylint: disable=no-member
 
 # Create the SQLAlchemy object to be initialized later in init_db()
+from sqlalchemy.exc import DataError
+
 db = SQLAlchemy()
 
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
-    pass
 
 
 class Recommendation(db.Model):
@@ -92,15 +93,20 @@ class Recommendation(db.Model):
             data (dict): A dictionary containing the Recommendation data
         """
         try:
-            self.product_id = data['product_id']
-            self.customer_id = data['customer_id']
-            self.recommend_type = data['recommend_type']
-            self.recommend_product_id = data['recommend_product_id']
+            self.product_id = int(data['product_id'])
+            self.customer_id = int(data['customer_id'])
+            self.recommend_type = str(data['recommend_type'])
+            self.recommend_product_id = int(data['recommend_product_id'])
+            if self.product_id < 0 or self.customer_id  < 0 or self.recommend_product_id < 0:
+                raise DataValidationError('Invalid Recommendation: input out of range')
         except KeyError as error:
             raise DataValidationError('Invalid Recommendation: missing ' + error.args[0])
-        except TypeError as error:
-            raise DataValidationError('Invalid Recommendation: body of request contained' \
+        except ValueError as error:
+            raise DataValidationError('Invalid Recommendation: body of request contained ' \
                                       'bad or no data')
+        except TypeError as error:
+            raise DataValidationError('Invalid Recommendation: body of request contained ' \
+                                      'bad data type')
         return self
 
     @classmethod
@@ -112,21 +118,6 @@ class Recommendation(db.Model):
         db.init_app(app)
         app.app_context().push()
         db.create_all()  # make our sqlalchemy tables
-#        #Recommendation(customer_id=2,
-#                       product_id=3,
-#                       recommend_product_id=4,
-#                       recommend_type="upsell",
-#                       rec_success=0).save()
-#        #Recommendation(customer_id=5,
-#                       product_id=6,
-#                       recommend_product_id=7,
-#                       recommend_type="downsell",
-#                       rec_success=2).save()
-#        #Recommendation(customer_id=5,
-#                       product_id=6,
-#                       recommend_product_id=8,
-#                       recommend_type="upsell",
-#                       rec_success=1).save()
 
     @classmethod
     def all(cls):

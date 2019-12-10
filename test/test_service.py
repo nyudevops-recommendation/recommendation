@@ -143,6 +143,24 @@ class TestRecommendationServer(unittest.TestCase):
                          test_recommendation.recommend_product_id,
                          "recommend_product_id does not match")
 
+    def test_create_recommendation_bad_data(self):
+        """ Create a new Recommendation with bad data """
+        test_recommendation = RecommendationFactory()
+        test_recommendation.product_id = "a bad id"
+        resp = self.app.post('/recommendations',
+                             json=test_recommendation.serialize(),
+                             content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_recommendation_missing_key(self):
+        """ Create a new Recommendation with bad data """
+        test_recommendation = RecommendationFactory()
+        test_recommendation.product_id = None
+        resp = self.app.post('/recommendations',
+                             json=test_recommendation.serialize(),
+                             content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_create_recommendation_bad_content_type(self):
         """ Create a new Recommendation with bad content type """
         test_recommendation = RecommendationFactory()
@@ -242,13 +260,6 @@ class TestRecommendationServer(unittest.TestCase):
         data = resp.get_json()[0]
         self.assertEqual(data['recommend_type'], test_rec.recommend_type)
 
-    def test_query_recommendation_multiple_entries(self):
-        """ Query by an specific recommend_type return multiple entries"""
-        self._create_recommendations(10)
-        resp = self.app.get('/recommendations?recommend-type={}'.format("upsell"))
-        data = resp.get_json()
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertGreater(len(data), 0)
 
     def test_query_recommendation_not_found(self):
         """ Query by an non-exist recommend_type """

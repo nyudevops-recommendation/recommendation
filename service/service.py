@@ -17,11 +17,12 @@ import logging
 from flask import jsonify, request, url_for, make_response, abort
 from flask_api import status  # HTTP Status Codes
 from flask_restplus import Api, Resource, fields, reqparse, inputs
+from sqlalchemy.exc import DataError, InvalidRequestError
 from werkzeug.exceptions import NotFound
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
-from service.models import Recommendation
+from service.models import Recommendation, DataValidationError
 
 # Import Flask application
 from service import app
@@ -281,3 +282,17 @@ def initialize_logging(log_level=logging.INFO):
         app.logger.setLevel(log_level)
         app.logger.propagate = False
         app.logger.info('Logging handler established')
+
+######################################################################
+# Error Handlers
+######################################################################
+@api.errorhandler(DataValidationError)
+def request_validation_error(error):
+    """ Handles Value Errors from bad data """
+    message = str(error)
+    app.logger.error(message)
+    return {
+        'status_code': status.HTTP_400_BAD_REQUEST,
+        'error': 'Bad Request',
+        'message': message
+    }, status.HTTP_400_BAD_REQUEST

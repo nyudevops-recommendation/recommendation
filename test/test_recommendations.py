@@ -155,6 +155,13 @@ class TestRecommendations(unittest.TestCase):
         self.assertEqual(recommendation.recommend_product_id, 4)
         self.assertEqual(recommendation.recommend_type, "upsell")
 
+    def test_deserialize_a_recommendation_negative_value(self):
+        """ Test deserialization of a Recommendation with negative value """
+        data = {"id": 1, "customer_id": -2,\
+         "product_id": 3, "recommend_product_id": 4, "recommend_type": "upsell"}
+        recommendation = Recommendation()
+        self.assertRaises(DataValidationError, recommendation.deserialize, data)
+
     def test_deserialize_missing_data(self):
         """ Test deserialization of a Recommendation with missing data"""
         data = {"id": 1}
