@@ -17,13 +17,17 @@ The recommendations resource is a representation a product recommendation based 
 - **update:** HTTP PUT /recommendations/{id}
 - **delete:** HTTP DELETE /recommendations/{id}
 - **success:** HTTP PUT /recommendations/{id}/success
+- **swagger API doc:** HTTP GET /apidocs
+
 
 ## Application URL: (deployed on IBM Cloud) 
 dev link: https://nyu-recommendation-service-f19.mybluemix.net/   
 
 prod link: https://nyu-recommendation-service-fa19.mybluemix.net/   
 
-swagger API: https://nyu-recommendation-service-f19.mybluemix.net/apidocs  
+## CI/CD Pipeline URL: 
+https://cloud.ibm.com/devops/pipelines/9b0d5bad-8e9f-4aae-83c8-dd2d02a415c8?env_id=ibm:yp:us-east
+
 
 ## To run the Flask app 
 
@@ -34,27 +38,3 @@ cd /vagrant
 honcho start
 ```
 then on your own machine, visit: http://localhost:5000/
-
-## To send out pull requests
-
-```
-git checkout -b my-branch
-```
-(add/modify something)
-```
-git add something
-git commit -m "add/modify something"
-```
-(Tips: save your local changes to a safe place and pray for no merge conflicts would occur before you do the following...)  
-```
-git checkout master
-git pull
-git checkout my-branch
-git merge master
-```
-(fix merge conflicts and git add, git commit again)
-```
-git push -u origin my-branch
-```
-(go to the PR page and attach your nosetests results in the description, and if there's no test results, the PR shouldn't be approved)
-
