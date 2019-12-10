@@ -179,11 +179,30 @@ class RecommendationResource(Resource):
         recommendation = Recommendation.find(rec_id)
         if not recommendation:
             api.abort(status.HTTP_404_NOT_FOUND, "Recommendation with id '{}' was not found.".format(rec_id))
+        return recommendation.serialize(), status.HTTP_200_OK		
+
+    #------------------------------------------------------------------
+    # UPDATE AN EXISTING RECOMMENDATION
+    #------------------------------------------------------------------
+    @api.doc('update_recommendation')
+    @api.response(404, 'Recommendation not found')
+    @api.response(400, 'The posted Recommendation data was not valid')
+    @api.expect(recommendation_model)
+    @api.marshal_with(recommendation_model)
+    def put(self, rec_id):
+        """
+        Update a Recommendation
+        This endpoint will update a Recommendation based the body that is posted
+        """
+        app.logger.info('Request to update recommendation with id: %s', rec_id)
+        check_content_type('application/json')
+        recommendation = Recommendation.find(rec_id)
+        if not recommendation:
+            api.abort(status.HTTP_404_NOT_FOUND, "Recommendation with id '{}' was not found.".format(rec_id))
+        recommendation.deserialize(request.get_json())
+        recommendation.id = rec_id
+        recommendation.save()
         return recommendation.serialize(), status.HTTP_200_OK
-
-		
-
-
 
 ######################################################################
 # UPDATE AN EXISTING RECOMMENDATION
