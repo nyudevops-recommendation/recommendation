@@ -209,14 +209,13 @@ class RecommendationResource(Resource):
 #  PATH: /recommendations/{<int:rec_id>/success
 ######################################################################
 @api.route('/recommendations/<int:rec_id>/success')
-@api.param('promotion_id', 'The Promotion identifier')
+@api.param('rec_id', 'The Recommendation identifier')
 class ApplyResource(Resource):
     #------------------------------------------------------------------
     # INCREMENT SUCCESS COUNTER
     #------------------------------------------------------------------
-    @api.doc('update_recommendation', security='apikey')
+    @api.doc('increment success counter')
     @api.response(404, 'Recommendation not found')
-    @api.response(400, 'The posted Recommendation data was not valid')
     @api.expect(recommendation_model)
     @api.marshal_with(recommendation_model)
     def put(self, rec_id):
