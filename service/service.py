@@ -220,10 +220,9 @@ class ApplyResource(Resource):
     @api.marshal_with(recommendation_model)
     def put(self, rec_id):
         """
-        Increase a Recommendation
-        This endpoint will update a Recommendation based the body that is posted
+        Increment A Recommendation's Success Field
         """
-        app.logger.info('Request to update recommendation with id: %s', rec_id)
+        app.logger.info('Increment success field for recommendation with id: %s', rec_id)
         check_content_type('application/json')
         recommendation = Recommendation.find(rec_id)
         if not recommendation:
