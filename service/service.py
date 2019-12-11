@@ -155,7 +155,7 @@ class RecommendationResource(Resource):
     @api.response(204, 'Recommendation deleted')
     def delete(self, rec_id):
         """
-        Delete a recommendation
+        Delete a Recommendation
     
         This endpoint will delete a recommendation based the id specified in the path
         """
@@ -220,10 +220,10 @@ class ApplyResource(Resource):
     @api.marshal_with(recommendation_model)
     def put(self, rec_id):
         """
-        Increase a Recommendation
-        This endpoint will update a Recommendation based the body that is posted
+        Increment A Recommendation's Success Field
+        This endpoint will increment the success counter based on the recommendtion succeed
         """
-        app.logger.info('Request to update recommendation with id: %s', rec_id)
+        app.logger.info('Increment success field for recommendation with id: %s', rec_id)
         check_content_type('application/json')
         recommendation = Recommendation.find(rec_id)
         if not recommendation:
